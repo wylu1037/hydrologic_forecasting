@@ -21,12 +21,29 @@
 
 ## 🔌 Backend
 
+### <a href="" target="_blank" rel="noreferrer"><img src="https://cdn.worldvectorlogo.com/logos/python-5.svg" alt="Near" width="15" height="15"/></a> Python
+
+#### [matplotlib.pyplot](https://matplotlib.org/3.5.3/api/_as_gen/matplotlib.pyplot.html)
+
+用于绘制数据图表的一个库，它提供了一组简单且易于使用的函数，类似于 MATLAB 风格的绘图API。它是 Matplotlib
+库的一部分，可以用来创建各种类型的图表，如线图、柱状图、散点图、饼图、直方图等。
+
+#### geopandas
+
+扩展了 Pandas 库的功能，提供了对地理空间数据的支持，使得用户能够轻松地处理、分析和可视化地理空间数据。
+
+#### folium
+
+Folium 是一个用于在 Python 中制作交互式地图的库，特别是基于 Leaflet.js 库构建的地图。它的主要作用是帮助用户在 Jupyter
+Notebook 环境中创建和展示交互式地图，并且能够轻松地将地理空间数据添加到地图中进行可视化。
+
 ## 📆 Develop Plan
 
-+ Read nc
-+ Convert nc to GeoJSON <sub>or TIF</sub>
-+ Store GeoJSON <sub>or TIF</sub> to GeoServer
-+ Display GeoJSON <sub>or TIF</sub> on the web side
+| Item | Deadline | Remark | Status |
+|------|----------|--------|--------|
+|      |          |        |        |
+|      |          |        |        |
+|      |          |        |        |
 
 ### GeoJSON data sample
 
@@ -52,82 +69,3 @@ GeoJSON is a format for encoding a variety of geographic data structures.
 *MultiLineString**, and **MultiPolygon**. Geometric objects with additional properties are Feature objects. Sets of
 > features are contained by FeatureCollection objects.
 
-## 备注
-
-### numpy.arange
-
-> 用于生成一个包含均匀间隔值的数组。
-
-参数说明：
-
-+ `start`：起始值，默认为 0。
-+ `stop`：终止值（不包含）。
-+ `step`：步长，默认为 1。
-+ `dtype`：返回数组的数据类型，如果没有提供，则会使用输入数据的类型。
-
-### numpy.vstack
-
-> 用于将多个数组按垂直方向（行方向）堆叠在一起。
-
-```python
-import numpy as np
-
-a = np.array([1, 2, 3])
-b = np.array([4, 5, 6])
-
-# 使用vstack进行垂直堆叠
-result = np.vstack((a, b))
-print(result)
-```
-
-```
-[[1 2 3]
- [4 5 6]]
-```
-
-### numpy.transpose
-
-> 用于对数组的维度进行转置或排列
-
-```python
-import numpy as np
-
-# 创建一个二维数组
-a = np.array([[1, 2], [3, 4]])
-
-# 对数组进行转置
-transposed = np.transpose(a)
-print(transposed)
-```
-
-```
-[[1 3]
- [2 4]]
-```
-
-### pandas.merge
-
-> 用于合并两个数据框（DataFrame）
->
-参数说明
-
-+ `right`: 要合并的另一个DataFrame。
-+ `how`: 合并的方式，有以下几种：
-    + `'left'`: 左连接，保留左边DataFrame的所有键。
-    + `'right'`: 右连接，保留右边DataFrame的所有键。
-    + `'outer'`: 外连接，保留所有键。
-    + `'inner'`: 内连接，只保留两个DataFrame中都有的键。
-+ `on`: 用于连接的列名。必须在两个DataFrame中都存在。
-+ `left_on` 和 right_on: 左右DataFrame中用于连接的列名。
-+ `left_index` 和 right_index: 使用左或右DataFrame的索引作为连接键。
-+ `sort`: 是否对合并后的数据进行排序。
-+ `suffixes`: 重叠列名的后缀。
-+ `indicator`: 添加一列指示每行的来源。
-
-### pandas.DataFrame
-
-> DataFrame是pandas库中的一种数据结构，类似于电子表格或SQL表格。它是一个二维的、带有标签的数据结构，可以存储不同类型的数据（如整数、浮点数、字符串等）。
-
-### numpy.ma.MaskedArray.compressed()
-
-> 用于将所有未被屏蔽的数据作为一个一维数组返回。
