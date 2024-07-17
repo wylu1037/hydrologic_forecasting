@@ -315,8 +315,8 @@ def main():
     tif_file = '../../storage/water_depth.tif'
     html_file = '../../storage/water_depth.html'
 
-    Converter().visualize_shp(shp_file, png_file)
-    # Converter.map_to_shp_and_html(nc_file, shp_file, html_file)
+    # Converter().visualize_shp(shp_file, png_file)
+    Converter.map_to_shp_and_html(nc_file, shp_file, html_file)
 
 
 if __name__ == '__main__':

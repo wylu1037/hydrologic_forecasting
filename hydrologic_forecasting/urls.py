@@ -17,9 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-import src.polls.views
+from src.app.controller import mapping_controller
 
 urlpatterns = [
+    path('mapping/convert-nc-to-shp', mapping_controller.convert_nc_to_shp_controller, name='convert-nc-to-shp'),
     path('admin/', admin.site.urls),
-    path('polls/index', src.polls.views.index, name='index'),
 ]
