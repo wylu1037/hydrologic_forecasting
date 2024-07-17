@@ -13,7 +13,7 @@ from rasterio.transform import from_origin
 from scipy.interpolate import griddata
 from shapely.geometry import Polygon
 
-WATER_DEPTH = "water_depth"
+WATER_DEPTH = 'wd'
 
 
 class Converter:
@@ -235,6 +235,7 @@ class Converter:
         Example:
             visualize_shp('water_depth.shp', 'water_depth.png')
         """
+        start = datetime.datetime.now()
         # 读取 .shp 文件
         gdf = gpd.read_file(shp_file)
 
@@ -259,6 +260,10 @@ class Converter:
         # dpi：图像分辨率，低 dpi（如 72 或 100），高 dpi（如 300 或 600）
         plt.savefig(png_file, dpi=300)
 
+        end = datetime.datetime.now()
+        execution_time = end - start
+        print(f"制Png图耗时: {execution_time.total_seconds()} seconds")
+
     @staticmethod
     def visualize_shp_interactive(gdf, output_html):
         """
@@ -273,6 +278,7 @@ class Converter:
         Example:.
             visualize_shp_interactive(gdf, 'water_depth.html')
         """
+        start = datetime.datetime.now()
         # 创建 folium 地图
         m = folium.Map(location=[gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()], zoom_start=10)
 
@@ -297,14 +303,20 @@ class Converter:
         # 保存为 HTML 文件
         m.save(output_html)
 
+        end = datetime.datetime.now()
+        execution_time = end - start
+        print(f"制Html图耗时: {execution_time.total_seconds()} seconds")
+
 
 def main():
-    shp_file = '../../storage/output.shp'
     nc_file = '../../storage/Mangkhut_4_map.nc'
-    tif_file = '../../storage/map.tif'
+    shp_file = '../../storage/water_depth.shp'
+    png_file = '../../storage/water_depth.png'
+    tif_file = '../../storage/water_depth.tif'
     html_file = '../../storage/water_depth.html'
 
-    Converter.map_to_shp_and_html(nc_file, shp_file, html_file)
+    Converter().visualize_shp(shp_file, png_file)
+    # Converter.map_to_shp_and_html(nc_file, shp_file, html_file)
 
 
 if __name__ == '__main__':
