@@ -1,6 +1,6 @@
-from src.app.repository.mapping_repository import MappingRepository
+from app.repository.mapping_repository import MappingRepository
 
-from src.tools.convert import Converter
+from tools.convert import Converter
 
 
 class MappingService:

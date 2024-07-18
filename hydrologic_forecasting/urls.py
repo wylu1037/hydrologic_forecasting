@@ -15,11 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
-from src.app.controller import mapping_controller
+from django.urls import include, path
 
 urlpatterns = [
-    path('mapping/convert-nc-to-shp', mapping_controller.convert_nc_to_shp_controller, name='convert-nc-to-shp'),
     path('admin/', admin.site.urls),
+    path('api/', include("app.urls")),
 ]

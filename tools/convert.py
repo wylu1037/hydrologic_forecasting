@@ -311,7 +311,7 @@ class Converter:
 def main():
     nc_file = '../../storage/Mangkhut_4_map.nc'
     shp_file = '../../storage/water_depth.shp'
-    png_file = '../../storage/water_depth.png'
+    png_file = '../storage/water_depth.png'
     tif_file = '../../storage/water_depth.tif'
     html_file = '../../storage/water_depth.html'
 
