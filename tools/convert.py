@@ -11,6 +11,7 @@ import rasterio
 import xarray as xr
 from rasterio.transform import from_origin
 from scipy.interpolate import griddata
+from shapely import MultiPoint
 from shapely.geometry import Polygon
 
 WATER_DEPTH = 'wd'
@@ -158,9 +159,15 @@ class Converter:
                     (lon[node[2] - 1], lat[node[2] - 1])
                 ])
             elif len(node) == 4:
+                sorted_nodes = sort_vertices(
+                    np.array([lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1], lon[node[3] - 1]]),
+                    np.array([lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1], lat[node[3] - 1]])
+                )
                 poly = Polygon([
-                    (lon[node[0] - 1], lat[node[0] - 1]), (lon[node[1] - 1], lat[node[1] - 1]),
-                    (lon[node[2] - 1], lat[node[2] - 1]), (lon[node[3] - 1], lat[node[3] - 1])
+                    (lon[node[sorted_nodes[0]] - 1], lat[node[sorted_nodes[0]] - 1]),
+                    (lon[node[sorted_nodes[1]] - 1], lat[node[sorted_nodes[1]] - 1]),
+                    (lon[node[sorted_nodes[2]] - 1], lat[node[sorted_nodes[2]] - 1]),
+                    (lon[node[sorted_nodes[3]] - 1], lat[node[sorted_nodes[3]] - 1])
                 ])
             else:
                 continue
@@ -308,12 +315,41 @@ class Converter:
         print(f"制Html图耗时: {execution_time.total_seconds()} seconds")
 
 
+def sort_vertices(lon, lat):
+    """
+    排序四角网格的顶点
+
+    Args:
+        lon(ndarray): 经度数组
+        lat(ndarray): 纬度数组
+
+    Returns:
+        ndarray: [3 0 1 2]
+
+    Example:
+        sort_vertices([22.52566799 22.52892391 22.52876978 22.52475916], [113.86085031 113.86083196 113.85659267 113.8577512 ])
+    """
+    # 计算质心
+    centroid = MultiPoint(list(zip(lon, lat))).centroid
+    cx, cy = centroid.x, centroid.y
+
+    # 计算每个顶点相对于质心的角度
+    angles = np.arctan2(lat - cy, lon - cx)
+
+    # 根据角度排序顶点
+    sort_order = np.argsort(angles)
+
+    # 返回排序后的顶点索引
+    return sort_order
+
+
 def main():
-    nc_file = '../../storage/Mangkhut_4_map.nc'
-    shp_file = '../../storage/water_depth.shp'
-    png_file = '../storage/water_depth.png'
-    tif_file = '../../storage/water_depth.tif'
-    html_file = '../../storage/water_depth.html'
+    base_dir = '/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage'
+    nc_file = base_dir + '/Mangkhut_4_map.nc'
+    shp_file = base_dir + '/water_depth.shp'
+    png_file = base_dir + '/water_depth.png'
+    tif_file = base_dir + '/water_depth.tif'
+    html_file = base_dir + '/water_depth.html'
 
     # Converter().visualize_shp(shp_file, png_file)
     Converter.map_to_shp_and_html(nc_file, shp_file, html_file)
