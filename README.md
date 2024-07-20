@@ -69,3 +69,24 @@ GeoJSON is a format for encoding a variety of geographic data structures.
 *MultiLineString**, and **MultiPolygon**. Geometric objects with additional properties are Feature objects. Sets of
 > features are contained by FeatureCollection objects.
 
+## Requirements
+
+Tesseract-OCR
+
++ Windows:
+
+1. 下载 Tesseract-OCR 的安装程序：Tesseract GitHub Releases。
+2. 运行安装程序并安装 Tesseract。
+3. 安装完成后，记下安装路径（例如，C:\Program Files\Tesseract-OCR\tesseract.exe）。
+
++ macOS:
+
+```shell
+brew install tesseract
+```
+
++ Linux:
+
+```shell
+sudo apt-get install tesseract-ocr
+```

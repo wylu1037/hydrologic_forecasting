@@ -6,7 +6,7 @@ import numpy as np
 from shapely import MultiPoint
 from shapely.geometry import Polygon
 
-from app.models import Project, ProjectGridData
+from app.models import Project, ForecastGridData, WaterInformation
 from app.repository.mapping_repository import MappingRepository
 from manage import project_root_dir
 
@@ -94,7 +94,7 @@ class MappingService:
                 }
                 json_arr.append(data)
 
-                ProjectGridData(
+                ForecastGridData(
                     project=project,
                     longitude=[lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1]],
                     latitude=[lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1]],
@@ -123,7 +123,7 @@ class MappingService:
                 }
                 json_arr.append(data)
 
-                ProjectGridData(
+                ForecastGridData(
                     project=project,
                     longitude=[lon[node[sorted_nodes[0]] - 1], lon[node[sorted_nodes[1]] - 1],
                                lon[node[sorted_nodes[2]] - 1], lon[node[sorted_nodes[3]] - 1]],
@@ -144,3 +144,21 @@ class MappingService:
         gdf.to_file(shp_file)
         with open(file=json_file_path, mode="w") as json_file:
             json.dump(json_arr, json_file)
+
+    @staticmethod
+    def import_water_information(req):
+        information = WaterInformation(
+            station=req.station,
+            datetime=req.datetime,
+            upstream_water_level=req.upstream_water_level,
+            downstream_water_level=req.downstream_water_level,
+            flow=req.flow
+        )
+        information.save()
+        return information.id
+
+    @staticmethod
+    def water_information_list(req):
+        return WaterInformation.objects.filter(
+            station=req.station, datetime__gte=req.start_datetime, datetime__lte=req.end_datetime).values(
+            'upstream_water_level', 'downstream_water_level', 'flow')
