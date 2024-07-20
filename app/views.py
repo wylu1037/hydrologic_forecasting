@@ -4,14 +4,23 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from app.request import ModelForecastRequest
+from app.request import ModelForecastRequest, ConvertNcRequest, CreateProjectRequest
 from app.service.mapping_service import MappingService
 from app.service.scripts_service import ScriptsService
 
 
+@csrf_exempt
 def convert_nc_to_shp_controller(request):
+    if request.method == 'GET':
+        return JsonResponse({'error': 'Unsupported method'})
     try:
-        MappingService.convert_nc_to_shp()
+        body = json.loads(request.body.decode('utf-8'))
+        req = ConvertNcRequest(project_id=body['project_id'])
+        if hasattr(request, 'time_index') and request['time_index'] > 0:
+            req.time_index = body['time_index']
+        if hasattr(request, 'min_water_depth') and body['min_water_depth'] > 0:
+            req.min_water_depth = body['min_water_depth']
+        MappingService.convert_nc_to_shp(req)
     except Exception as e:
         return JsonResponse({'error': str(e)})
     else:
@@ -31,3 +40,18 @@ def execute(request):
         return JsonResponse({'error': str(e)})
     else:
         return JsonResponse({'status': 'ok', 'data': result})
+
+
+# 创建项目
+@csrf_exempt
+def create_project(request):
+    if request.method == 'GET':
+        return JsonResponse({'error': 'Unsupported method'})
+    try:
+        body = json.loads(request.body.decode('utf-8'))
+        req = CreateProjectRequest(body['name'], body['description'], body['time_index'])
+        primary_key = MappingService.create_project(req)
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+    else:
+        return JsonResponse({'status': 'ok', 'data': primary_key})

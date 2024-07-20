@@ -18,5 +18,10 @@ def main():
     execute_from_command_line(sys.argv)
 
 
+def project_root_dir():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    return current_dir
+
+
 if __name__ == '__main__':
     main()

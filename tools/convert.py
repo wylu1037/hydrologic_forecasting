@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import branca.colormap as cm
 import folium
@@ -126,7 +127,7 @@ class Converter:
         return x_c, y_c
 
     @staticmethod
-    def map_to_shp_and_html(nc_file, shp_file, html_file, time_index=15):
+    def map_to_shp_and_html(nc_file, shp_file, html_file, time_index=15, min_depth=0.01):
         """
         将nc文件转为shp并输出html
 
@@ -135,6 +136,7 @@ class Converter:
             shp_file(String): Path and name of desired GeoJSON file output.
             html_file(String): Path and name of desired HTML file output.
             time_index(int): mesh2d_waterdepth的时间序列，范围为[0, 168]
+            min_depth
 
         Example:
             map_to_shp_and_html('map.nc', 'water_depth.shp', 'water_depth.html')
@@ -151,13 +153,27 @@ class Converter:
         # 判断是三角网格还是四角网格，并生成相应的几何图形
         geometries = []
         water_depth_arr = []
+        json_arr = []
         for i, face_node in enumerate(face_nodes):
+            if water_depth[i] <= min_depth:
+                continue
+
             node = face_node.compressed()
             if len(node) == 3:
                 poly = Polygon([
                     (lon[node[0] - 1], lat[node[0] - 1]), (lon[node[1] - 1], lat[node[1] - 1]),
                     (lon[node[2] - 1], lat[node[2] - 1])
                 ])
+
+                data = {
+                    'latLon': [
+                        [lat[node[0] - 1], lon[node[0] - 1]],
+                        [lat[node[1] - 1], lon[node[1] - 1]],
+                        [lat[node[2] - 1], lon[node[2] - 1]],
+                    ],
+                    'depth': water_depth[i],
+                }
+                json_arr.append(data)
             elif len(node) == 4:
                 sorted_nodes = sort_vertices(
                     np.array([lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1], lon[node[3] - 1]]),
@@ -169,6 +185,17 @@ class Converter:
                     (lon[node[sorted_nodes[2]] - 1], lat[node[sorted_nodes[2]] - 1]),
                     (lon[node[sorted_nodes[3]] - 1], lat[node[sorted_nodes[3]] - 1])
                 ])
+
+                data = {
+                    'latLon': [
+                        [lat[node[sorted_nodes[0]] - 1], lon[node[sorted_nodes[0]] - 1]],
+                        [lat[node[sorted_nodes[1]] - 1], lon[node[sorted_nodes[1]] - 1]],
+                        [lat[node[sorted_nodes[2]] - 1], lon[node[sorted_nodes[2]] - 1]],
+                        [lat[node[sorted_nodes[3]] - 1], lon[node[sorted_nodes[3]] - 1]]
+                    ],
+                    'depth': water_depth[i],
+                }
+                json_arr.append(data)
             else:
                 continue
 
@@ -176,10 +203,14 @@ class Converter:
             water_depth_arr.append(water_depth[i])
 
         # 创建 GeoDataFrame
-        gdf = gpd.GeoDataFrame({'geometry': geometries, WATER_DEPTH: water_depth_arr})
+        d
+        gdf = gpd.GeoDataFrame({'geometry': geometries, WATER_DEPTH: water_depth_arr}, crs="EPSG:4326")
 
         # 保存为 .shp 文件
         gdf.to_file(shp_file)
+        json_file_path = '/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/water_depth.json'
+        with open(file=json_file_path, mode="w") as json_file:
+            json.dump(json_arr, json_file)
 
         Converter.visualize_shp_interactive(gdf, html_file)
 
