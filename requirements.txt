@@ -14,5 +14,4 @@ matplotlib~=3.9.1
 branca~=0.7.2
 folium~=0.17.0
 APScheduler~=3.10.4
-pytesseract~=0.3.10
 pillow~=10.4.0

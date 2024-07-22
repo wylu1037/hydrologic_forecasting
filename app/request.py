@@ -8,7 +8,7 @@ class ModelForecastRequest:
 
 
 class ConvertNcRequest:
-    def __init__(self, project_id, time_index=15, min_water_depth=0.01):
+    def __init__(self, project_id, time_index=15, min_water_depth=0):
         self.project_id = project_id
         self.time_index = time_index
         self.min_water_depth = min_water_depth
