@@ -4,7 +4,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from app.request import ModelForecastRequest, ConvertNcRequest, CreateProjectRequest
+from app.request import ModelForecastRequest, HandleMapRequest, CreateProjectRequest
 from app.service.mapping_service import MappingService
 from app.service.scripts_service import ScriptsService
 
@@ -15,13 +15,26 @@ def handle_map_controller(request):
         return JsonResponse({'error': 'Unsupported method'})
     try:
         body = json.loads(request.body.decode('utf-8'))
-        req = ConvertNcRequest(project_id=body['project_id'])
+        req = HandleMapRequest(project_id=body['project_id'])
 
         if 'time_index' in body and body['time_index'] >= 0:
             req.time_index = body['time_index']
         if 'min_water_depth' in body and body['min_water_depth'] > 0:
             req.min_water_depth = body['min_water_depth']
         MappingService.handle_map(req)
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+    else:
+        return JsonResponse({'status': 'ok'})
+
+
+@csrf_exempt
+def handle_station_controller(request):
+    if request.method == 'GET':
+        return JsonResponse({'error': 'Unsupported method'})
+    try:
+        body = json.loads(request.body.decode('utf-8'))
+        MappingService.handle_station()
     except Exception as e:
         return JsonResponse({'error': str(e)})
     else:

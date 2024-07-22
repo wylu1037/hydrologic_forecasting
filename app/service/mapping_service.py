@@ -4,7 +4,7 @@ import netCDF4 as nc
 import numpy as np
 from shapely import MultiPoint
 
-from app.models import Project, MapData
+from app.models import Project, MapData, StationData
 from app.repository.mapping_repository import MappingRepository
 from manage import project_root_dir
 
@@ -90,6 +90,7 @@ class MappingService:
                         longitude=[lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1]],
                         latitude=[lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1]],
                         water_depth=water_depth[i],
+                        timestamp=int(time)
                     ).count()
                     if count == 0:
                         MapData(
@@ -97,6 +98,7 @@ class MappingService:
                             longitude=[lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1]],
                             latitude=[lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1]],
                             water_depth=water_depth[i],
+                            timestamp=int(time)
                         ).save()
 
                 elif len(node) == 4:
@@ -123,6 +125,7 @@ class MappingService:
                         latitude=[lat[node[sorted_nodes[0]] - 1], lat[node[sorted_nodes[1]] - 1],
                                   lat[node[sorted_nodes[2]] - 1], lat[node[sorted_nodes[3]] - 1]],
                         water_depth=water_depth[i],
+                        timestamp=int(time)
                     ).count()
                     if count == 0:
                         MapData(
@@ -132,9 +135,36 @@ class MappingService:
                             latitude=[lat[node[sorted_nodes[0]] - 1], lat[node[sorted_nodes[1]] - 1],
                                       lat[node[sorted_nodes[2]] - 1], lat[node[sorted_nodes[3]] - 1]],
                             water_depth=water_depth[i],
+                            timestamp=int(time)
                         ).save()
                 else:
                     continue
 
             with open(file=json_file_path, mode="w") as json_file:
                 json.dump(json_arr, json_file)
+
+    @staticmethod
+    def handle_station():
+        root_dir = project_root_dir()
+        nc_file = f'{root_dir}/storage/output/FlowFM_his.nc'
+        dataset = nc.Dataset(nc_file)
+
+        lon = dataset.variables['station_x_coordinate'][:]
+        lat = dataset.variables['station_y_coordinate'][:]
+        times = dataset.variables['time'][:]
+        water_depth = dataset.variables['waterdepth'][:]
+        water_level = dataset.variables['waterlevel'][:]
+        velocity_magnitude = dataset.variables['velocity_magnitude'][:]
+
+        project = Project.objects.get(pk=1)
+        for i, time in enumerate(times):
+            for j in range(lon.size):
+                StationData(
+                    project=project,
+                    longitude=lon[j],
+                    latitude=lat[j],
+                    water_depth=water_depth[i, j],
+                    water_level=water_level[i, j],
+                    velocity_magnitude=velocity_magnitude[i, j],
+                    timestamp=int(time),
+                ).save()

@@ -10,19 +10,22 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class ForecastGridData(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    longitude = models.JSONField(blank=True, default=list)
-    latitude = models.JSONField(blank=True, default=list)
-    water_depth = models.FloatField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class MapData(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     longitude = models.JSONField(blank=True, default=list)
     latitude = models.JSONField(blank=True, default=list)
-    water_depth = models.FloatField(blank=True)
+    water_depth = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    timestamp = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class StationData(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    longitude = models.FloatField()
+    latitude = models.FloatField()
+    water_depth = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    water_level = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    velocity_magnitude = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     timestamp = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
