@@ -15,6 +15,7 @@ class MapData(models.Model):
     longitude = models.JSONField(blank=True, default=list)
     latitude = models.JSONField(blank=True, default=list)
     water_depth = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    risk = models.IntegerField(default=0)
     timestamp = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 

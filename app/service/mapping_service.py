@@ -53,13 +53,16 @@ class MappingService:
     def handle_map(req):
         root_dir = project_root_dir()
         nc_file = f'{root_dir}/storage/output/FlowFM_map.nc'
+        risk_nc_file = f'{root_dir}/storage/output/FlowFM_clm.nc'
 
         # 获取经纬度和数据
         dataset = nc.Dataset(nc_file)
+        risk_ds = nc.Dataset(risk_nc_file)
         lon = dataset.variables['mesh2d_node_x'][:]
         lat = dataset.variables['mesh2d_node_y'][:]
         face_nodes = dataset.variables['mesh2d_face_nodes'][:]
         water_depth_arr = dataset.variables['mesh2d_waterdepth'][:]  # 169, 61309
+        risk_arr = risk_ds.variables['mesh2d_waterdepth'][:]
         times = dataset.variables['time'][:]
 
         # 判断是三角网格还是四角网格，并生成相应的几何图形
@@ -67,6 +70,7 @@ class MappingService:
         for idx, time in enumerate(times):
             json_arr = []
             water_depth = water_depth_arr[idx, :]
+            risk = risk_arr[idx, :]
             json_file_path = f'{root_dir}/storage/danyang_water_depth_time{idx}.json'
             for i, face_node in enumerate(face_nodes):
                 # 筛掉不满足水深条件的网格
@@ -82,6 +86,7 @@ class MappingService:
                             [lat[node[2] - 1], lon[node[2] - 1]],
                         ],
                         'depth': water_depth[i],
+                        'risk': int(risk[i])
                     }
                     json_arr.append(data)
 
@@ -90,6 +95,7 @@ class MappingService:
                         longitude=[lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1]],
                         latitude=[lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1]],
                         water_depth=water_depth[i],
+                        risk=risk[i],
                         timestamp=int(time)
                     ).count()
                     if count == 0:
@@ -98,6 +104,7 @@ class MappingService:
                             longitude=[lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1]],
                             latitude=[lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1]],
                             water_depth=water_depth[i],
+                            risk=risk[i],
                             timestamp=int(time)
                         ).save()
 
@@ -115,6 +122,7 @@ class MappingService:
                             [lat[node[sorted_nodes[3]] - 1], lon[node[sorted_nodes[3]] - 1]]
                         ],
                         'depth': water_depth[i],
+                        'risk': int(risk[i])
                     }
                     json_arr.append(data)
 
@@ -125,6 +133,7 @@ class MappingService:
                         latitude=[lat[node[sorted_nodes[0]] - 1], lat[node[sorted_nodes[1]] - 1],
                                   lat[node[sorted_nodes[2]] - 1], lat[node[sorted_nodes[3]] - 1]],
                         water_depth=water_depth[i],
+                        risk=risk[i],
                         timestamp=int(time)
                     ).count()
                     if count == 0:
@@ -135,6 +144,7 @@ class MappingService:
                             latitude=[lat[node[sorted_nodes[0]] - 1], lat[node[sorted_nodes[1]] - 1],
                                       lat[node[sorted_nodes[2]] - 1], lat[node[sorted_nodes[3]] - 1]],
                             water_depth=water_depth[i],
+                            risk=risk[i],
                             timestamp=int(time)
                         ).save()
                 else:
@@ -157,7 +167,10 @@ class MappingService:
         velocity_magnitude = dataset.variables['velocity_magnitude'][:]
 
         project = Project.objects.get(pk=1)
+
+        json_arr = []
         for i, time in enumerate(times):
+            json_file_path = f'{root_dir}/storage/danyang_station_time{i}.json'
             for j in range(lon.size):
                 StationData(
                     project=project,
@@ -168,3 +181,15 @@ class MappingService:
                     velocity_magnitude=velocity_magnitude[i, j],
                     timestamp=int(time),
                 ).save()
+
+                data = {
+                    'lon': lon[j],
+                    'lat': lat[j],
+                    'time': time,
+                    'waterDepth': water_depth[i, j],
+                    'waterLevel': water_level[i, j],
+                    'velocityMagnitude': velocity_magnitude[i, j],
+                }
+                json_arr.append(data)
+            with open(file=json_file_path, mode="w") as json_file:
+                json.dump(json_arr, json_file)
