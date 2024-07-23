@@ -81,7 +81,7 @@ def create_project(request):
 
 
 @csrf_exempt
-def export_map(request):
+def export_map_controller(request):
     if request.method == 'GET':
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
     try:
@@ -94,7 +94,7 @@ def export_map(request):
 
 
 @csrf_exempt
-def export_station(request):
+def export_station_controller(request):
     if request.method == 'GET':
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
     try:

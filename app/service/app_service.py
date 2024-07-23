@@ -199,7 +199,21 @@ class AppService:
         """
         导出网格数据
         """
-        print(self)
+        project = Project.objects.get(pk=req.project_id)
+        start_time = datetime_to_timestamp(req.start_time)
+        end_time = datetime_to_timestamp(req.end_time)
+        data = self.repository.get_map_list(project, start_time, end_time)
+        json_array = []
+        for elem in data:
+            json_data = {
+                'id': elem[0],
+                'coordinates': [[y, x] for x, y in zip(elem[1], elem[2])],
+                'waterDepth': elem[3],
+                'risk': elem[4],
+                'time': timestamp_to_datetime(elem[5])
+            }
+            json_array.append(json_data)
+        return json_array
 
     def export_station(self, req):
         """
