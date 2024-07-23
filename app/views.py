@@ -104,3 +104,16 @@ def export_station_controller(request):
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0, 'data': data})
+
+
+@csrf_exempt
+def project_pagination(request, page, size):
+    if request.method == 'POST':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        data = service.project_pagination(page, size)
+        print(data)
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})

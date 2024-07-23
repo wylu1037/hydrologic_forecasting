@@ -31,13 +31,13 @@ class CreateProjectRequest:
 
 @dataclass
 class ExportMapRequest:
-    project_id: int
     start_time: str
     end_time: str
+    project_id: Optional[int] = field(default=None)
 
 
 @dataclass
 class ExportStationRequest:
-    project_id: int
     start_time: str
     end_time: str
+    project_id: Optional[int] = field(default=None)

@@ -1,4 +1,6 @@
-from app.models import StationData, MapData
+from django.core.paginator import Paginator
+
+from app.models import StationData, MapData, Project
 
 
 class AppRepository:
@@ -86,3 +88,20 @@ class AppRepository:
                              )
                 )
         return list(data)
+
+    @staticmethod
+    def get_latest_project():
+        return Project.objects.order_by('-id').first()
+
+    @staticmethod
+    def project_pagination(page, size):
+        projects = Project.objects.all().order_by('-id')
+        paginator = Paginator(projects, size)
+        items = paginator.get_page(page)
+        data = {
+            'items': list(items.object_list.values_list('id', 'name', 'description', 'created_at')),
+            'page': items.number,
+            'size': size,
+            'total': paginator.count
+        }
+        return data

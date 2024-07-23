@@ -199,6 +199,8 @@ class AppService:
         """
         导出网格数据
         """
+        if req.project_id is None:
+            req.project_id = self.repository.get_latest_project().id
         project = Project.objects.get(pk=req.project_id)
         start_time = datetime_to_timestamp(req.start_time)
         end_time = datetime_to_timestamp(req.end_time)
@@ -219,6 +221,8 @@ class AppService:
         """
         导出站点数据
         """
+        if req.project_id is None:
+            req.project_id = self.repository.get_latest_project().id
         project = Project.objects.get(pk=req.project_id)
         start_time = datetime_to_timestamp(req.start_time)
         end_time = datetime_to_timestamp(req.end_time)
@@ -237,3 +241,6 @@ class AppService:
             }
             json_array.append(json_data)
         return json_array
+
+    def project_pagination(self, page, size):
+        return self.repository.project_pagination(page, size)
