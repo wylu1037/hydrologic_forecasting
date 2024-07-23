@@ -125,3 +125,23 @@ class AppRepository:
                 for row in cursor.fetchall()
             ]
         return data
+
+    @staticmethod
+    def trend_station(name):
+        query = """
+        select id, station_name, water_depth, water_level, velocity_magnitude, timestamp
+        from (select *
+              from app_stationdata
+              order by id desc
+              limit 480)
+        where station_name = %s
+        order by timestamp;
+                """
+        with connection.cursor() as cursor:
+            cursor.execute(query, [name])
+            columns = [col[0] for col in cursor.description]
+            data = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
+        return data

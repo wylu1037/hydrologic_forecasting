@@ -12,4 +12,5 @@ urlpatterns = [
     path('v1/project/pagination/<int:page>/<int:size>', views.project_pagination, name='project pagination'),
     path('v1/station/representation', views.representation_station_controller,
          name='representation_station_controller'),
+    path('v1/station/trend/<str:name>', views.trend_station_controller, name='trend_station_controller')
 ]

@@ -129,3 +129,15 @@ def representation_station_controller(request):
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0, 'data': data})
+
+
+@csrf_exempt
+def trend_station_controller(request, name):
+    if request.method == 'GET':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        data = service.trend_station(name)
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})

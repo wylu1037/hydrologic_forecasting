@@ -259,3 +259,19 @@ class AppService:
             }
             json_arr.append(json_data)
         return json_arr
+
+    def trend_station(self, name):
+        data = self.repository.trend_station(name)
+
+        json_arr = []
+        for elem in data:
+            json_data = {
+                'id': elem['id'],
+                'stationName': elem['station_name'],
+                'waterDepth': elem['water_depth'],
+                'waterLevel': elem['water_level'],
+                'velocityMagnitude': elem['velocity_magnitude'],
+                'time': timestamp_to_datetime(elem['timestamp']),
+            }
+            json_arr.append(json_data)
+        return json_arr
