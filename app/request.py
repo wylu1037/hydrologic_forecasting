@@ -41,3 +41,7 @@ class ExportStationRequest:
     start_time: str
     end_time: str
     project_id: Optional[int] = field(default=None)
+
+
+class RepresentationStationRequest:
+    count: int = field(default=10)

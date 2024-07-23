@@ -10,4 +10,6 @@ urlpatterns = [
     path('v1/script/run', views.execute, name='run scripts'),
     path('v1/project/create', views.create_project, name='create project'),
     path('v1/project/pagination/<int:page>/<int:size>', views.project_pagination, name='project pagination'),
+    path('v1/station/representation', views.representation_station_controller,
+         name='representation_station_controller'),
 ]

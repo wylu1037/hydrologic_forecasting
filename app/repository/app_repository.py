@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.db import connection
 
 from app.models import StationData, MapData, Project
 
@@ -104,4 +105,23 @@ class AppRepository:
             'size': size,
             'total': paginator.count
         }
+        return data
+
+    @staticmethod
+    def representation_station():
+        query = """
+        select id, station_name, max(water_depth) as water_depth, max(velocity_magnitude) as velocity_magnitude, timestamp
+        from (select *
+              from app_stationdata
+              order by id desc
+              limit 480)
+        group by timestamp;
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            columns = [col[0] for col in cursor.description]
+            data = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
         return data

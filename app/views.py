@@ -117,3 +117,15 @@ def project_pagination(request, page, size):
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0, 'data': data})
+
+
+@csrf_exempt
+def representation_station_controller(request):
+    if request.method == 'GET':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        data = service.representation_station()
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})

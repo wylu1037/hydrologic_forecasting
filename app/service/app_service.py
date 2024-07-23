@@ -244,3 +244,18 @@ class AppService:
 
     def project_pagination(self, page, size):
         return self.repository.project_pagination(page, size)
+
+    def representation_station(self):
+        data = self.repository.representation_station()
+
+        json_arr = []
+        for elem in data:
+            json_data = {
+                'id': elem['id'],
+                'stationName': elem['station_name'],
+                'waterDepth': elem['water_depth'],
+                'velocityMagnitude': elem['velocity_magnitude'],
+                'time': timestamp_to_datetime(elem['timestamp'])
+            }
+            json_arr.append(json_data)
+        return json_arr
