@@ -62,3 +62,24 @@ class AppRepository:
         data.save()
 
         return data.pk
+
+    @staticmethod
+    def get_map_list(project, start_time, end_time):
+        data = MapData.objects.filter(project=project, timestamp__gte=start_time, timestamp__lte=end_time).values_list()
+        return list(data)
+
+    @staticmethod
+    def get_station_list(project, start_time, end_time):
+        data = (StationData.objects
+                .filter(project=project, timestamp__gte=start_time, timestamp__lte=end_time)
+                .values_list('id',
+                             'longitude',
+                             'latitude',
+                             'water_depth',
+                             'water_level',
+                             'velocity_magnitude',
+                             'station_name',
+                             'timestamp'
+                             )
+                )
+        return list(data)

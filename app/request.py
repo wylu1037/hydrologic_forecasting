@@ -32,12 +32,12 @@ class CreateProjectRequest:
 @dataclass
 class ExportMapRequest:
     project_id: int
-    start_date_time: str
-    end_date_time: str
+    start_time: str
+    end_time: str
 
 
 @dataclass
 class ExportStationRequest:
     project_id: int
-    start_date_time: str
-    end_date_time: str
+    start_time: str
+    end_time: str

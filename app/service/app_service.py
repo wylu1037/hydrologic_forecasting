@@ -6,6 +6,7 @@ import netCDF4 as nc
 import numpy as np
 from shapely import MultiPoint
 
+from app.convert import timestamp_to_datetime, datetime_to_timestamp
 from app.models import Project
 from app.repository.app_repository import AppRepository
 from manage import project_root_dir
@@ -173,24 +174,24 @@ class AppService:
 
         project = Project.objects.get(pk=1)
 
-        json_arr = []
+        # json_arr = []
         for i, time in enumerate(times):
-            json_file_path = f'{root_dir}/storage/danyang_station_time{i}.json'
+            # json_file_path = f'{root_dir}/storage/danyang_station_time{i}.json'
             for j in range(lon.size):
-                station_name = ''.join(station_names[j].compressed().astype(str))
+                station_name = ''.join([name.strip() for name in station_names[j].compressed().astype(str) if name])
                 self.repository.upsert_station(
                     project, station_name, lon[j], lat[j], water_depth[i, j], water_level[i, j],
                     velocity_magnitude[i, j], time)
 
-                data = {
-                    'lon': lon[j],
-                    'lat': lat[j],
-                    'time': time,
-                    'waterDepth': water_depth[i, j],
-                    'waterLevel': water_level[i, j],
-                    'velocityMagnitude': velocity_magnitude[i, j],
-                }
-                json_arr.append(data)
+                # data = {
+                #     'lon': lon[j],
+                #     'lat': lat[j],
+                #     'time': time,
+                #     'waterDepth': water_depth[i, j],
+                #     'waterLevel': water_level[i, j],
+                #     'velocityMagnitude': velocity_magnitude[i, j],
+                # }
+                # json_arr.append(data)
             # with open(file=json_file_path, mode="w") as json_file:
             #     json.dump(json_arr, json_file)
 
@@ -204,4 +205,21 @@ class AppService:
         """
         导出站点数据
         """
-        print(self)
+        project = Project.objects.get(pk=req.project_id)
+        start_time = datetime_to_timestamp(req.start_time)
+        end_time = datetime_to_timestamp(req.end_time)
+        data = self.repository.get_station_list(project, start_time, end_time)
+        json_array = []
+        for elem in data:
+            json_data = {
+                'id': elem[0],
+                'lon': elem[1],
+                'lat': elem[2],
+                'waterDepth': elem[3],
+                'waterLevel': elem[4],
+                'velocityMagnitude': elem[5],
+                'stationName': elem[6],
+                'time': timestamp_to_datetime(elem[7]),
+            }
+            json_array.append(json_data)
+        return json_array
