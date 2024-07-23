@@ -19,6 +19,12 @@ def main():
 
 
 def project_root_dir():
+    """
+    获取项目的根路径
+
+    Returns:
+        String: project root dir
+    """
     current_dir = os.path.dirname(os.path.abspath(__file__))
     return current_dir
 

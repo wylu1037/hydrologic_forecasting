@@ -22,6 +22,7 @@ class MapData(models.Model):
 
 class StationData(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    station_name = models.CharField(max_length=30, blank=True)
     longitude = models.FloatField()
     latitude = models.FloatField()
     water_depth = models.DecimalField(max_digits=5, decimal_places=2, default=0)

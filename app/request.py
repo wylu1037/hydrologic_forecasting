@@ -1,20 +1,43 @@
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+@dataclass
 class ModelForecastRequest:
-    def __init__(self, scheme_name, date_time, step_size, schem_description, args):
-        self.scheme_name = scheme_name
-        self.date_time = date_time
-        self.step_size = step_size
-        self.schem_description = schem_description
-        self.args = args
+    scheme_name: Optional[str] = field(default=None)
+    date_time: Optional[str] = field(default=None)
+    step_size: Optional[int] = field(default=None)
+    schem_description: Optional[str] = field(default=None)
+    args: list[str] = field(default_factory=list)
 
 
+@dataclass
 class HandleMapRequest:
-    def __init__(self, project_id, min_water_depth=0):
-        self.project_id = project_id
-        self.min_water_depth = min_water_depth
+    project_id: int
+    min_water_depth: Optional[float] = field(default=0)
 
 
+@dataclass
+class HandleStationRequest:
+    project_id: int
+
+
+@dataclass
 class CreateProjectRequest:
-    def __init__(self, name, description, time_index):
-        self.name = name
-        self.description = description
-        self.time_index = time_index
+    name: str
+    description: str
+    time_index: int
+
+
+@dataclass
+class ExportMapRequest:
+    project_id: int
+    start_date_time: str
+    end_date_time: str
+
+
+@dataclass
+class ExportStationRequest:
+    project_id: int
+    start_date_time: str
+    end_date_time: str

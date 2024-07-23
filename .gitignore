@@ -5,3 +5,7 @@ storage/Mangkhut_4_map.nc
 storage/*.tif
 storage/*.xml
 .DS_Store
+
+dist
+build
+manage.spec
