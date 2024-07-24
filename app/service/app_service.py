@@ -7,6 +7,7 @@ from shapely import MultiPoint
 
 from app.models import Project
 from app.repository.app_repository import AppRepository
+from app.request import HandleMapRequest, HandleStationRequest
 from app.tools import search_file
 from app.tools import timestamp_to_datetime, datetime_to_timestamp
 from hydrologic_forecasting.settings import config, BASE_DIR
@@ -62,11 +63,27 @@ class AppService:
         else:
             return result.stdout
 
-    def create_project(self, req):
+    def run_project(self, req):
         """
-        创建项目
+        创建项目，并运行模型
         """
-        return self.repository.insert_project(req)
+        project_id = self.repository.insert_project(req)
+
+        # write input data
+        # WaterLevel.bc Discharge.bc
+        write_upstream_water_level(req.upstream_water_level)
+        write_downstream_water_level(req.downstream_water_level)
+
+        # execute bat
+        bat_path = config['model']['script']['bat_path']
+        result = subprocess.run([bat_path], capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(result.stderr)
+        else:
+            # 执行成功
+            self.handle_map(HandleMapRequest(project_id=project_id))
+            self.handle_station(HandleStationRequest(project_id=project_id))
+            return result.stdout
 
     def update_project(self, req):
         self.repository.update_project(req)
@@ -78,7 +95,7 @@ class AppService:
         """
         处理网格数据
         """
-        output_dir = config['model']['map']['output']
+        output_dir = config['model']['script']['output']
         nc_file = search_file(output_dir, '_map.nc')
         risk_nc_file = search_file(output_dir, '_clm.nc')
 
@@ -134,7 +151,7 @@ class AppService:
         """
         处理站点数据
         """
-        output_dir = config['model']['map']['output']
+        output_dir = config['model']['script']['output']
         nc_file = search_file(output_dir, '_his.nc')
         dataset = nc.Dataset(nc_file)
 
@@ -245,3 +262,69 @@ class AppService:
             'upstreamWaterLevel': upstream_water_level,
             'downstreamWaterLevel': downstream_water_level
         }
+
+
+def write_downstream_water_level(downstream_water_level):
+    data_str = ""
+    for elem in downstream_water_level:
+        data_str += f"{datetime_to_timestamp(elem['datetime'])}  {elem['data']}\n"
+
+    content = f"""[forcing]
+Name                            = WL_0001
+Function                        = timeseries
+Time-interpolation              = linear
+Quantity                        = time
+Unit                            = seconds since 2001-01-01 00:00:00
+Quantity                        = waterlevelbnd
+Unit                            = m
+{data_str}
+[forcing]
+Name                            = WL_0002
+Function                        = timeseries
+Time-interpolation              = linear
+Quantity                        = time
+Unit                            = seconds since 2001-01-01 00:00:00
+Quantity                        = waterlevelbnd
+Unit                            = m
+{data_str}"""
+
+    input_dir = config['model']['script']['input']
+    path = os.path.join(input_dir, "WaterLevel.bc")
+    if os.path.exists(path):
+        os.remove(path)
+
+    with open(path, "w") as file:
+        file.write(content)
+
+
+def write_upstream_water_level(upstream_water_level):
+    data_str = ""
+    for elem in upstream_water_level:
+        data_str += f"{datetime_to_timestamp(elem['datetime'])}  {elem['data']}\n"
+
+    content = f"""[forcing]
+Name                            = Boundary01_0001
+Function                        = timeseries
+Time-interpolation              = linear
+Quantity                        = time
+Unit                            = seconds since 2001-01-01 00:00:00
+Quantity                        = dischargebnd
+Unit                            = m3/s
+{data_str}
+[forcing]
+Name                            = Boundary01_0002
+Function                        = timeseries
+Time-interpolation              = linear
+Quantity                        = time
+Unit                            = seconds since 2001-01-01 00:00:00
+Quantity                        = dischargebnd
+Unit                            = m3/s
+{data_str}"""
+
+    input_dir = config['model']['script']['input']
+    path = os.path.join(input_dir, "Discharge.bc")
+    if os.path.exists(path):
+        os.remove(path)
+
+    with open(path, "w") as file:
+        file.write(content)

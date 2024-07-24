@@ -23,10 +23,12 @@ class HandleStationRequest:
 
 
 @dataclass
-class CreateProjectRequest:
+class RunProjectRequest:
     name: str
     description: str
     forecast_period: int
+    upstream_water_level: list
+    downstream_water_level: list
 
 
 @dataclass

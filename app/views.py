@@ -4,7 +4,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from app.request import HandleMapRequest, CreateProjectRequest, ModelForecastRequest, HandleStationRequest, \
+from app.request import HandleMapRequest, RunProjectRequest, ModelForecastRequest, HandleStationRequest, \
     ExportMapRequest, ExportStationRequest, UpdateProjectRequest
 from app.service.app_service import AppService
 
@@ -72,15 +72,15 @@ def execute(request):
 
 
 @csrf_exempt
-def create_project(request):
+def run_project(request):
     """
     创建项目，并运行模型
     """
     if request.method == 'GET':
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
     try:
-        req = request_to_object(request, CreateProjectRequest)
-        primary_key = service.create_project(req)
+        req = request_to_object(request, RunProjectRequest)
+        primary_key = service.run_project(req)
     except Exception as e:
         return JsonResponse({'code': -1, 'error': str(e)})
     else:

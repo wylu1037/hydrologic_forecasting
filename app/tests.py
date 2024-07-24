@@ -3,6 +3,7 @@
 import pytesseract
 from PIL import Image
 
+from app.service.app_service import write_upstream_water_level
 from app.tools import is_two_decimal_number, datetime_to_timestamp
 from hydrologic_forecasting.settings import BASE_DIR
 
@@ -40,4 +41,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    res = write_upstream_water_level("", [{
+        "station": "谏壁闸",
+        "datetime": "2024-07-24 20:00:00",
+        "data": "6.85"
+    },
+        {
+            "station": "谏壁闸",
+            "datetime": "2024-07-24 19:00:00",
+            "data": "6.49"
+        }, ])
+    print(res)

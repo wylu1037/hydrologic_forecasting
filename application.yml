@@ -1,7 +1,8 @@
 model:
-  map:
+  script:
     input: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/input"
     output: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/output"
+    bat_path: ""
 
 scheduler:
   rainfall:
