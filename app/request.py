@@ -26,7 +26,15 @@ class HandleStationRequest:
 class CreateProjectRequest:
     name: str
     description: str
-    time_index: int
+    forecast_period: int
+
+
+@dataclass
+class UpdateProjectRequest:
+    id: int
+    name: Optional[str] = field(default=None)
+    description: Optional[str] = field(default=None)
+    forecast_period: Optional[int] = field(default=None)
 
 
 @dataclass

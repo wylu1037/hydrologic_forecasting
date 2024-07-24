@@ -145,3 +145,25 @@ class AppRepository:
                 for row in cursor.fetchall()
             ]
         return data
+
+    @staticmethod
+    def insert_project(req):
+        project = Project(**req)
+        project.save()
+        return project.id
+
+    @staticmethod
+    def update_project(req):
+        project = Project.objects.get(id=req.id)
+        if req.name is not None:
+            project.name = req.name
+        if req.description is not None:
+            project.description = req.description
+        if req.forecast_period is not None:
+            project.forecast_period = req.forecast_period
+        project.save()
+
+    @staticmethod
+    def delete_project(project_id):
+        project = Project.objects.get(id=project_id)
+        project.delete()

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from app.request import HandleMapRequest, CreateProjectRequest, ModelForecastRequest, HandleStationRequest, \
-    ExportMapRequest, ExportStationRequest
+    ExportMapRequest, ExportStationRequest, UpdateProjectRequest
 from app.service.app_service import AppService
 
 service = AppService()
@@ -66,18 +66,51 @@ def execute(request):
         return JsonResponse({'code': 0, 'data': result})
 
 
-# 创建项目
 @csrf_exempt
 def create_project(request):
+    """
+    创建项目，并运行模型
+    """
     if request.method == 'GET':
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
     try:
         req = request_to_object(request, CreateProjectRequest)
-        primary_key = AppService.create_project(req)
+        primary_key = service.create_project(req)
     except Exception as e:
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0, 'data': primary_key})
+
+
+@csrf_exempt
+def update_project(request):
+    """
+    更新项目
+    """
+    if request.method == 'GET':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        req = request_to_object(request, UpdateProjectRequest)
+        service.update_project(req)
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0})
+
+
+@csrf_exempt
+def delete_project(request, project_id):
+    """
+    删除项目信息
+    """
+    if request.method == 'GET':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        service.delete_project(project_id)
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0})
 
 
 @csrf_exempt
@@ -112,7 +145,6 @@ def project_pagination(request, page, size):
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
     try:
         data = service.project_pagination(page, size)
-        print(data)
     except Exception as e:
         return JsonResponse({'code': -1, 'error': str(e)})
     else:

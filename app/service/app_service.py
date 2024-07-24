@@ -62,14 +62,17 @@ class AppService:
         else:
             return result.stdout
 
-    @staticmethod
-    def create_project(req):
+    def create_project(self, req):
         """
         创建项目
         """
-        project = Project(name=req.name, description=req.description, time_index=req.time_index)
-        project.save()
-        return project.id
+        return self.repository.insert_project(req)
+
+    def update_project(self, req):
+        self.repository.update_project(req)
+
+    def delete_project(self, project_id):
+        self.repository.delete_project(project_id)
 
     def handle_map(self, req):
         """
