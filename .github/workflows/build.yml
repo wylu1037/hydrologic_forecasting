@@ -39,7 +39,7 @@ jobs:
 
       - name: Install PyInstaller
         run: |
-          pip install pyinstaller==5.6.2
+          pip install pyinstaller==5.13.2
 
       - name: Build package on Linux
         if: runner.os == 'Linux'
