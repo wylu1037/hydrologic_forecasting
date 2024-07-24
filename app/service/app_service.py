@@ -234,3 +234,14 @@ class AppService:
             }
             json_arr.append(json_data)
         return json_arr
+
+    def latest_water_information(self):
+        rainfall = self.repository.get_latest_rainfall()
+        upstream_water_level = self.repository.get_latest_upstream_water_level()
+        downstream_water_level = self.repository.get_latest_downstream_water_level()
+
+        return {
+            'rainfall': rainfall,
+            'upstreamWaterLevel': upstream_water_level,
+            'downstreamWaterLevel': downstream_water_level
+        }

@@ -178,3 +178,15 @@ def trend_station_controller(request, name):
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0, 'data': data})
+
+
+@csrf_exempt
+def latest_water_information(request):
+    if request.method == 'GET':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        data = service.latest_water_information()
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})

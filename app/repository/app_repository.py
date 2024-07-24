@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.db import connection
 
-from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel
+from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel, Rainfall
 
 
 class AppRepository:
@@ -209,3 +209,29 @@ class AppRepository:
         )
         model_data.save()
         return model_data.id
+
+    @staticmethod
+    def get_latest_upstream_water_level():
+        result = UpstreamWaterLevel.objects.order_by('-datetime')[:24].values_list('station', 'datetime', 'data')
+        return convert_to_json(result)
+
+    @staticmethod
+    def get_latest_downstream_water_level():
+        result = DownstreamWaterLevel.objects.order_by('-datetime')[:24].values_list('station', 'datetime', 'data')
+        return convert_to_json(result)
+
+    @staticmethod
+    def get_latest_rainfall():
+        result = Rainfall.objects.order_by('-datetime')[:24].values_list('station', 'datetime', 'data')
+        return convert_to_json(result)
+
+
+def convert_to_json(result):
+    json_arr = []
+    for station, datetime, data in result:
+        json_arr.append({
+            'station': station,
+            'datetime': datetime.strftime('%Y-%m-%d %H:%M:%S'),
+            'data': data
+        })
+    return json_arr
