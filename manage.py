@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-import logging
 import os
 import sys
-
-from hydrologic_forecasting.settings import CONFIG_DIR
 
 
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hydrologic_forecasting.settings')
-    logging.error(f"Loading configuration from {CONFIG_DIR}")
 
     try:
         from django.core.management import execute_from_command_line
