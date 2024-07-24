@@ -9,8 +9,7 @@ from app.models import Project
 from app.repository.app_repository import AppRepository
 from app.tools import search_file
 from app.tools import timestamp_to_datetime, datetime_to_timestamp
-from hydrologic_forecasting.settings import config
-from manage import project_root_dir
+from hydrologic_forecasting.settings import config, BASE_DIR
 
 
 def sort_vertices(lon, lat):
@@ -56,7 +55,7 @@ class AppService:
         运行模型脚本
         """
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        bat_path = os.path.join(project_root_dir(), 'script.sh')
+        bat_path = os.path.join(BASE_DIR, 'script.sh')
         result = subprocess.run([bat_path] + req.args, capture_output=True, text=True)
         if result.returncode != 0:
             raise RuntimeError(result.stderr)

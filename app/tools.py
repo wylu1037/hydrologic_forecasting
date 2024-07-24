@@ -1,4 +1,5 @@
 import glob
+import logging
 import os.path
 import re
 from datetime import datetime, timedelta
@@ -74,10 +75,11 @@ def download_png():
                 f.write(response.content)
             return png_file
         else:
-            print(response)
-            print("下载图片资源失败")
+            logging.error("下载图片资源失败，响应：%s", response)
+            raise ValueError(response)
     except Exception as e:
-        print(e)
+        logging.error("下载谏壁闸水位图片失败：%s", e)
+        raise e
 
 
 if __name__ == '__main__':
