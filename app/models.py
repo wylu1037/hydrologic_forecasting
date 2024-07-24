@@ -3,6 +3,9 @@ from django.db import models
 
 
 class Project(models.Model):
+    """
+    项目方案数据
+    """
     name = models.CharField(max_length=100)
     description = models.TextField()
     forecast_period = models.IntegerField(default=0)
@@ -11,6 +14,9 @@ class Project(models.Model):
 
 
 class MapData(models.Model):
+    """
+    地图网格数据
+    """
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     longitude = models.JSONField(blank=True, default=list)
     latitude = models.JSONField(blank=True, default=list)
@@ -21,6 +27,9 @@ class MapData(models.Model):
 
 
 class StationData(models.Model):
+    """
+    站点数据
+    """
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     station_name = models.CharField(max_length=30, blank=True)
     longitude = models.FloatField()
@@ -32,8 +41,30 @@ class StationData(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-# 降水数据
 class Rainfall(models.Model):
+    """
+    降水数据
+    """
+    station = models.CharField(max_length=10)
+    datetime = models.DateTimeField()
+    data = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class UpstreamWaterLevel(models.Model):
+    """
+    上游水位
+    """
+    station = models.CharField(max_length=10)
+    datetime = models.DateTimeField()
+    data = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class DownstreamWaterLevel(models.Model):
+    """
+    下游水位
+    """
     station = models.CharField(max_length=10)
     datetime = models.DateTimeField()
     data = models.DecimalField(max_digits=10, decimal_places=2)

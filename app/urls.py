@@ -3,6 +3,7 @@ from django.urls import path
 from app import views
 
 urlpatterns = [
+    path('v1/ping', views.ping_controller, name='ping'),
     path('v1/map/handle', views.handle_map_controller, name='handle_map_controller'),
     path('v1/map/export', views.export_map_controller, name='export_map_controller'),
     path('v1/station/handle', views.handle_station_controller, name='handle_station_controller'),

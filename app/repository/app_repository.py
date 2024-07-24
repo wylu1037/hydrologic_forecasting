@@ -147,6 +147,14 @@ class AppRepository:
         return data
 
     @staticmethod
+    def get_project_by_id(project_id):
+        try:
+            project = Project.objects.get(pk=project_id)
+            return project
+        except Project.DoesNotExist:
+            raise ValueError(f'项目方案 {project_id} 不存在，请检查参数是否正确')
+
+    @staticmethod
     def insert_project(req):
         project = Project(**req)
         project.save()

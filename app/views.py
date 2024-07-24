@@ -28,6 +28,11 @@ def request_to_object(request, clazz):
 
 
 @csrf_exempt
+def ping_controller(request):
+    return JsonResponse({'reply': '🎉🎉🎉 Congratulations! Success visited.'})
+
+
+@csrf_exempt
 def handle_map_controller(request):
     if request.method == 'GET':
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
@@ -46,7 +51,7 @@ def handle_station_controller(request):
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})
     try:
         req = request_to_object(request, HandleStationRequest)
-        service.handle_station()
+        service.handle_station(req)
     except Exception as e:
         return JsonResponse({'code': -1, 'error': str(e)})
     else:

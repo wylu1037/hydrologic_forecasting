@@ -7,6 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from bs4 import BeautifulSoup
 
 from app.models import Rainfall
+from hydrologic_forecasting.settings import config
 
 # from app.models import Rainfall
 
@@ -15,7 +16,8 @@ _URL = 'http://www.nmc.cn/rest/weather?stationid=aELXI&_='
 
 
 def pull_data_from_dan_yang():
-    response = requests.get(f'{_DAN_YANG}{datetime.datetime.now().timestamp()}')
+    url = config['scheduler']['rainfall']['dan_yang']
+    response = requests.get(f'{url}{datetime.datetime.now().timestamp()}')
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
         json_string = soup.prettify()

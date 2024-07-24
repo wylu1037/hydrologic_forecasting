@@ -1,4 +1,3 @@
-import json
 import os
 import subprocess
 
@@ -6,9 +5,11 @@ import netCDF4 as nc
 import numpy as np
 from shapely import MultiPoint
 
-from app.convert import timestamp_to_datetime, datetime_to_timestamp
 from app.models import Project
 from app.repository.app_repository import AppRepository
+from app.tools import search_file
+from app.tools import timestamp_to_datetime, datetime_to_timestamp
+from hydrologic_forecasting.settings import config
 from manage import project_root_dir
 
 
@@ -78,9 +79,9 @@ class AppService:
         """
         处理网格数据
         """
-        root_dir = project_root_dir()
-        nc_file = f'{root_dir}/storage/output/FlowFM_map.nc'
-        risk_nc_file = f'{root_dir}/storage/output/FlowFM_clm.nc'
+        output_dir = config['model']['map']['output']
+        nc_file = search_file(output_dir, '_map.nc')
+        risk_nc_file = search_file(output_dir, '_clm.nc')
 
         # 获取经纬度和数据
         dataset = nc.Dataset(nc_file)
@@ -93,12 +94,10 @@ class AppService:
         times = dataset.variables['time'][:]
 
         # 判断是三角网格还是四角网格，并生成相应的几何图形
-        project = Project.objects.get(pk=req.project_id)
+        project = self.repository.get_project_by_id(req.project_id)
         for idx, time in enumerate(times):
-            json_arr = []
             water_depth = water_depth_arr[idx, :]
             risk = risk_arr[idx, :]
-            json_file_path = f'{root_dir}/storage/danyang_water_depth_time{idx}.json'
             for i, face_node in enumerate(face_nodes):
                 # 筛掉不满足水深条件的网格
                 if water_depth[i] <= req.min_water_depth:
@@ -106,17 +105,6 @@ class AppService:
 
                 node = face_node.compressed()
                 if len(node) == 3:
-                    data = {
-                        'latLon': [
-                            [lat[node[0] - 1], lon[node[0] - 1]],
-                            [lat[node[1] - 1], lon[node[1] - 1]],
-                            [lat[node[2] - 1], lon[node[2] - 1]],
-                        ],
-                        'depth': water_depth[i],
-                        'risk': int(risk[i])
-                    }
-                    json_arr.append(data)
-
                     self.repository.upsert_map(
                         project,
                         [lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1]],
@@ -130,19 +118,6 @@ class AppService:
                         np.array([lon[node[0] - 1], lon[node[1] - 1], lon[node[2] - 1], lon[node[3] - 1]]),
                         np.array([lat[node[0] - 1], lat[node[1] - 1], lat[node[2] - 1], lat[node[3] - 1]])
                     )
-
-                    data = {
-                        'latLon': [
-                            [lat[node[sorted_nodes[0]] - 1], lon[node[sorted_nodes[0]] - 1]],
-                            [lat[node[sorted_nodes[1]] - 1], lon[node[sorted_nodes[1]] - 1]],
-                            [lat[node[sorted_nodes[2]] - 1], lon[node[sorted_nodes[2]] - 1]],
-                            [lat[node[sorted_nodes[3]] - 1], lon[node[sorted_nodes[3]] - 1]]
-                        ],
-                        'depth': water_depth[i],
-                        'risk': int(risk[i])
-                    }
-                    json_arr.append(data)
-
                     self.repository.upsert_map(
                         project,
                         [lon[node[sorted_nodes[0]] - 1], lon[node[sorted_nodes[1]] - 1], lon[node[sorted_nodes[2]] - 1],
@@ -156,15 +131,12 @@ class AppService:
                 else:
                     continue
 
-            with open(file=json_file_path, mode="w") as json_file:
-                json.dump(json_arr, json_file)
-
-    def handle_station(self):
+    def handle_station(self, req):
         """
         处理站点数据
         """
-        root_dir = project_root_dir()
-        nc_file = f'{root_dir}/storage/output/FlowFM_his.nc'
+        output_dir = config['model']['map']['output']
+        nc_file = search_file(output_dir, '_his.nc')
         dataset = nc.Dataset(nc_file)
 
         lon = dataset.variables['station_x_coordinate'][:]
@@ -175,28 +147,13 @@ class AppService:
         water_level = dataset.variables['waterlevel'][:]
         velocity_magnitude = dataset.variables['velocity_magnitude'][:]
 
-        project = Project.objects.get(pk=1)
-
-        # json_arr = []
+        project = self.repository.get_project_by_id(req.project_id)
         for i, time in enumerate(times):
-            # json_file_path = f'{root_dir}/storage/danyang_station_time{i}.json'
             for j in range(lon.size):
                 station_name = ''.join([name.strip() for name in station_names[j].compressed().astype(str) if name])
                 self.repository.upsert_station(
                     project, station_name, lon[j], lat[j], water_depth[i, j], water_level[i, j],
                     velocity_magnitude[i, j], time)
-
-                # data = {
-                #     'lon': lon[j],
-                #     'lat': lat[j],
-                #     'time': time,
-                #     'waterDepth': water_depth[i, j],
-                #     'waterLevel': water_level[i, j],
-                #     'velocityMagnitude': velocity_magnitude[i, j],
-                # }
-                # json_arr.append(data)
-            # with open(file=json_file_path, mode="w") as json_file:
-            #     json.dump(json_arr, json_file)
 
     def export_map(self, req):
         """
@@ -204,7 +161,7 @@ class AppService:
         """
         if req.project_id is None:
             req.project_id = self.repository.get_latest_project().id
-        project = Project.objects.get(pk=req.project_id)
+        project = self.repository.get_project_by_id(req.project_id)
         start_time = datetime_to_timestamp(req.start_time)
         end_time = datetime_to_timestamp(req.end_time)
         data = self.repository.get_map_list(project, start_time, end_time)

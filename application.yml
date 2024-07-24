@@ -1,0 +1,8 @@
+model:
+  map:
+    input: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/input"
+    output: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/output"
+
+scheduler:
+  rainfall:
+    dan_yang: "http://www.nmc.cn/rest/weather?stationid=tCUFF&_="
