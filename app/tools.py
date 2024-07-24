@@ -1,6 +1,11 @@
 import glob
 import os.path
+import re
 from datetime import datetime, timedelta
+
+import requests
+
+from hydrologic_forecasting.settings import BASE_DIR
 
 
 def datetime_to_timestamp(time_string):
@@ -16,7 +21,7 @@ def datetime_to_timestamp(time_string):
     time_obj = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S")
     start_time = datetime(2001, 1, 1, 0, 0, 0)
     time_diff = time_obj - start_time
-    return time_diff.total_seconds()
+    return int(time_diff.total_seconds())
 
 
 def timestamp_to_datetime(timestamp_seconds):
@@ -49,7 +54,31 @@ def search_file(directory, pattern):
     return file[0]
 
 
+def is_two_decimal_number(number):
+    """
+    Checks if the given number is a decimal number.
+    """
+    pattern = r'^\d+\.\d{2}$'
+    return bool(re.match(pattern, number))
+
+
+def download_png():
+    png_file = f'{BASE_DIR}/storage/water_level.png'
+    try:
+        response = requests.get(
+            f'http://www.jsswj.com.cn:88/jsswxxSSI/static/map/chart/0/061fece4c7524ee2adcae16982229e0e_list.png?t={datetime.now().timestamp()}')
+        if response.status_code == 200:
+            if os.path.exists(png_file):
+                os.remove(png_file)
+            with open(png_file, 'wb') as f:
+                f.write(response.content)
+            return png_file
+        else:
+            print(response)
+            print("下载图片资源失败")
+    except Exception as e:
+        print(e)
+
+
 if __name__ == '__main__':
-    timestamp = 649382400
-    time_str = timestamp_to_datetime(timestamp)
-    print(time_str)
+    download_png()

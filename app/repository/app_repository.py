@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.db import connection
 
-from app.models import StationData, MapData, Project
+from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel
 
 
 class AppRepository:
@@ -175,3 +175,37 @@ class AppRepository:
     def delete_project(project_id):
         project = Project.objects.get(id=project_id)
         project.delete()
+
+    @staticmethod
+    def upsert_upstream_water_level(station_name, datetime, data):
+        count = UpstreamWaterLevel.objects.filter(
+            station=station_name,
+            datetime=datetime,
+        ).count()
+        if count > 0:
+            return None
+
+        model_data = UpstreamWaterLevel(
+            station=station_name,
+            datetime=datetime,
+            data=data
+        )
+        model_data.save()
+        return model_data.id
+
+    @staticmethod
+    def upsert_downstream_water_level(station_name, datetime, data):
+        count = DownstreamWaterLevel.objects.filter(
+            station=station_name,
+            datetime=datetime,
+        ).count()
+        if count > 0:
+            return None
+
+        model_data = DownstreamWaterLevel(
+            station=station_name,
+            datetime=datetime,
+            data=data
+        )
+        model_data.save()
+        return model_data.id
