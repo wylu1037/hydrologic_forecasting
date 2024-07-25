@@ -45,47 +45,26 @@ Notebook 环境中创建和展示交互式地图，并且能够轻松地将地�
 |      |          |        |        |
 |      |          |        |        |
 
-### GeoJSON data sample
-
-GeoJSON is a format for encoding a variety of geographic data structures.
-
-```json
-{
-  "type": "Feature",
-  "geometry": {
-    "type": "Point",
-    "coordinates": [
-      125.6,
-      10.1
-    ]
-  },
-  "properties": {
-    "name": "Dinagat Islands"
-  }
-}
-```
-
-> GeoJSON supports the following geometry types: **Point**, **LineString**, **Polygon**, **MultiPoint**, *
-*MultiLineString**, and **MultiPolygon**. Geometric objects with additional properties are Feature objects. Sets of
-> features are contained by FeatureCollection objects.
-
 ## Requirements
 
-Tesseract-OCR
+### Sqlite3
 
-+ Windows:
++ [下载](https://www.sqlite.org/download.html)
++ [安装指导](https://www.runoob.com/sqlite/sqlite-installation.html)
 
-1. 下载 Tesseract-OCR 的安装程序：Tesseract GitHub Releases。
-2. 运行安装程序并安装 Tesseract。
-3. 安装完成后，记下安装路径（例如，C:\Program Files\Tesseract-OCR\tesseract.exe）。
+### Tesseract-OCR
 
-+ macOS:
++ **Windows**
+
+[👀 Click Me](https://tesseract-ocr.github.io/tessdoc/Installation.html)
+
++ **macOS**
 
 ```shell
 brew install tesseract
 ```
 
-+ Linux:
++ **Linux**
 
 ```shell
 sudo apt-get install tesseract-ocr
