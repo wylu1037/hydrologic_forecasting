@@ -102,5 +102,22 @@ def convert_map_data_to_json(data):
     return json_array
 
 
+def convert_station_data_to_json(data):
+    json_array = []
+    for elem in data:
+        json_data = {
+            'id': elem[0],
+            'lon': elem[1],
+            'lat': elem[2],
+            'waterDepth': elem[3],
+            'waterLevel': elem[4],
+            'velocityMagnitude': elem[5],
+            'stationName': elem[6],
+            'time': timestamp_to_datetime(elem[7]),
+        }
+        json_array.append(json_data)
+    return json_array
+
+
 if __name__ == '__main__':
     download_png()

@@ -76,22 +76,6 @@ class AppRepository:
         return list(data)
 
     @staticmethod
-    def get_station_list(project, start_time, end_time):
-        data = (StationData.objects
-                .filter(project=project, timestamp__gte=start_time, timestamp__lte=end_time)
-                .values_list('id',
-                             'longitude',
-                             'latitude',
-                             'water_depth',
-                             'water_level',
-                             'velocity_magnitude',
-                             'station_name',
-                             'timestamp'
-                             )
-                )
-        return list(data)
-
-    @staticmethod
     def get_latest_project():
         return Project.objects.order_by('-id').first()
 
@@ -232,9 +216,9 @@ class AppRepository:
         return times
 
     @staticmethod
-    def get_map_by_timestamp(timestamp):
+    def get_map_by_project_and_timestamp(project, timestamp):
         data = (
-            MapData.objects.filter(timestamp=timestamp)
+            MapData.objects.filter(project=project, timestamp=timestamp)
             .values_list('id', 'longitude', 'latitude', 'water_depth',
                          'risk', 'timestamp')
         )
@@ -245,7 +229,7 @@ class AppRepository:
         times = AppRepository.get_map_times(project)
         arr = []
         for time in times:
-            data = AppRepository.get_map_by_timestamp(time['timestamp'])
+            data = AppRepository.get_map_by_project_and_timestamp(project, time['timestamp'])
             datetime = timestamp_to_datetime(time['timestamp'])
             arr.append({
                 'time': datetime,
@@ -253,6 +237,42 @@ class AppRepository:
             })
 
         return arr
+
+    @staticmethod
+    def get_station_times(project):
+        times = StationData.objects.filter(project=project).values('timestamp').distinct().order_by('-timestamp')
+        return times
+
+    @staticmethod
+    def get_station_by_project_and_timestamp(project, timestamp):
+        data = (
+            StationData.objects.filter(project=project, timestamp=timestamp)
+            .values_list('id',
+                         'longitude',
+                         'latitude',
+                         'water_depth',
+                         'water_level',
+                         'velocity_magnitude',
+                         'station_name',
+                         'timestamp')
+        )
+        return list(data)
+
+    @staticmethod
+    def get_station_by_project_and_station_name(project, station_name):
+        data = (
+            StationData.objects.filter(project=project, station_name=station_name)
+            .order_by('-timestamp')
+            .values_list('id',
+                         'longitude',
+                         'latitude',
+                         'water_depth',
+                         'water_level',
+                         'velocity_magnitude',
+                         'station_name',
+                         'timestamp')
+        )
+        return list(data)
 
 
 def convert_to_json(result):

@@ -8,8 +8,8 @@ from shapely import MultiPoint
 from app.models import Project
 from app.repository.app_repository import AppRepository
 from app.request import HandleMapRequest, HandleStationRequest
-from app.tools import search_file, convert_map_data_to_json
-from app.tools import timestamp_to_datetime, datetime_to_timestamp
+from app.tools import search_file, convert_map_data_to_json, convert_station_data_to_json
+from app.tools import timestamp_to_datetime
 from hydrologic_forecasting.settings import config
 
 
@@ -184,23 +184,10 @@ class AppService:
         if req.project_id is None:
             req.project_id = self.repository.get_latest_project().id
         project = Project.objects.get(pk=req.project_id)
-        start_time = datetime_to_timestamp(req.start_time)
-        end_time = datetime_to_timestamp(req.end_time)
-        data = self.repository.get_station_list(project, start_time, end_time)
-        json_array = []
-        for elem in data:
-            json_data = {
-                'id': elem[0],
-                'lon': elem[1],
-                'lat': elem[2],
-                'waterDepth': elem[3],
-                'waterLevel': elem[4],
-                'velocityMagnitude': elem[5],
-                'stationName': elem[6],
-                'time': timestamp_to_datetime(elem[7]),
-            }
-            json_array.append(json_data)
-        return json_array
+
+        times = self.repository.get_station_times(project)
+        data = self.repository.get_station_by_project_and_timestamp(project, times[0]['timestamp'])
+        return convert_station_data_to_json(data)
 
     def project_pagination(self, page, size):
         return self.repository.project_pagination(page, size)
@@ -246,6 +233,14 @@ class AppService:
             'upstreamWaterLevel': upstream_water_level,
             'downstreamWaterLevel': downstream_water_level
         }
+
+    def get_station_by_project_and_station_name(self, req):
+        if req.project_id is None:
+            req.project_id = self.repository.get_latest_project().id
+        project = Project.objects.get(pk=req.project_id)
+
+        data = self.repository.get_station_by_project_and_station_name(project, req.name)
+        return convert_station_data_to_json(data)
 
 
 def write_downstream_water_level(downstream_water_level):
