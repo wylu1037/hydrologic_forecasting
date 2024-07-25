@@ -168,9 +168,9 @@ class AppService:
         if req.project_id is None:
             req.project_id = self.repository.get_latest_project().id
         project = self.repository.get_project_by_id(req.project_id)
-        start_time = datetime_to_timestamp(req.start_time)
-        end_time = datetime_to_timestamp(req.end_time)
-        data = self.repository.get_map_list(project, start_time, end_time)
+
+        times = self.repository.get_map_times(project)
+        data = self.repository.get_map_by_project_and_timestamp(project, times[0]['timestamp'])
         return convert_map_data_to_json(data)
 
     def export_history_map(self):

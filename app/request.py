@@ -32,8 +32,6 @@ class UpdateProjectRequest:
 
 @dataclass
 class ExportMapRequest:
-    start_time: str
-    end_time: str
     project_id: Optional[int] = field(default=None)
 
 

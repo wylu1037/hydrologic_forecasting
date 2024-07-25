@@ -68,9 +68,9 @@ class AppRepository:
         return data.pk
 
     @staticmethod
-    def get_map_list(project, start_time, end_time):
+    def get_map_by_project_and_timestamp(project, timestamp):
         data = (MapData.objects
-                .filter(project=project, timestamp__gte=start_time, timestamp__lte=end_time)
+                .filter(project=project, timestamp=timestamp)
                 .values_list('id', 'longitude', 'latitude', 'water_depth', 'risk', 'timestamp')
                 )
         return list(data)
