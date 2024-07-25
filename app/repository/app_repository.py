@@ -212,17 +212,17 @@ class AppRepository:
 
     @staticmethod
     def get_latest_upstream_water_level():
-        result = UpstreamWaterLevel.objects.order_by('-datetime')[:24].values_list('station', 'datetime', 'data')
+        result = UpstreamWaterLevel.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
         return convert_to_json(result)
 
     @staticmethod
     def get_latest_downstream_water_level():
-        result = DownstreamWaterLevel.objects.order_by('-datetime')[:24].values_list('station', 'datetime', 'data')
+        result = DownstreamWaterLevel.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
         return convert_to_json(result)
 
     @staticmethod
     def get_latest_rainfall():
-        result = Rainfall.objects.order_by('-datetime')[:24].values_list('station', 'datetime', 'data')
+        result = Rainfall.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
         return convert_to_json(result)
 
 

@@ -4,7 +4,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from app.request import HandleMapRequest, RunProjectRequest, ModelForecastRequest, HandleStationRequest, \
+from app.request import HandleMapRequest, RunProjectRequest, HandleStationRequest, \
     ExportMapRequest, ExportStationRequest, UpdateProjectRequest
 from app.service.app_service import AppService
 
@@ -56,19 +56,6 @@ def handle_station_controller(request):
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0})
-
-
-@csrf_exempt
-def execute(request):
-    if request.method == 'GET':
-        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
-    try:
-        req = request_to_object(request, ModelForecastRequest)
-        result = AppService.run(req)
-    except Exception as e:
-        return JsonResponse({'code': -1, 'error': str(e)})
-    else:
-        return JsonResponse({'code': 0, 'data': result})
 
 
 @csrf_exempt

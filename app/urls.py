@@ -8,7 +8,6 @@ urlpatterns = [
     path('v1/map/export', views.export_map_controller, name='export_map_controller'),
     path('v1/station/handle', views.handle_station_controller, name='handle_station_controller'),
     path('v1/station/export', views.export_station_controller, name='export station'),
-    path('v1/script/run', views.execute, name='run scripts'),
     path('v1/project/run', views.run_project, name='create project'),
     path('v1/project/update', views.update_project, name='update project'),
     path('v1/project/delete/<int:project_id>', views.delete_project, name='delete project'),

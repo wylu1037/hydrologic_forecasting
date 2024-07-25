@@ -10,7 +10,7 @@ from app.repository.app_repository import AppRepository
 from app.request import HandleMapRequest, HandleStationRequest
 from app.tools import search_file
 from app.tools import timestamp_to_datetime, datetime_to_timestamp
-from hydrologic_forecasting.settings import config, BASE_DIR
+from hydrologic_forecasting.settings import config
 
 
 def sort_vertices(lon, lat):
@@ -50,19 +50,6 @@ class AppService:
             self._app_repository_instance = AppRepository()
         self.repository = self._app_repository_instance
 
-    @staticmethod
-    def run(req):
-        """
-        运行模型脚本
-        """
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        bat_path = os.path.join(BASE_DIR, 'script.sh')
-        result = subprocess.run([bat_path] + req.args, capture_output=True, text=True)
-        if result.returncode != 0:
-            raise RuntimeError(result.stderr)
-        else:
-            return result.stdout
-
     def run_project(self, req):
         """
         创建项目，并运行模型
@@ -71,6 +58,10 @@ class AppService:
 
         # write input data
         # WaterLevel.bc Discharge.bc
+        if req.upstream_water_level is None or req.downstream_water_level is None:
+            res = self.latest_water_information()
+            req.upstream_water_level = res['upstreamWaterLevel']
+            req.downstream_water_level = res['downstreamWaterLevel']
         write_upstream_water_level(req.upstream_water_level)
         write_downstream_water_level(req.downstream_water_level)
 
@@ -266,8 +257,16 @@ class AppService:
 
 def write_downstream_water_level(downstream_water_level):
     data_str = ""
-    for elem in downstream_water_level:
-        data_str += f"{datetime_to_timestamp(elem['datetime'])}  {elem['data']}\n"
+    times = [
+        649296000, 649299600, 649303200, 649306800, 649310400, 649314000, 649317600, 649321200, 649324800,
+        649328400, 649332000, 649335600, 649339200, 649342800, 649346400, 649350000, 649353600, 649357200,
+        649360800, 649364400, 649368000, 649371600, 649375200, 649378800, 649382400, 649386000, 649389600,
+        649393200, 649396800, 649400400, 649404000, 649407600, 649411200, 649414800, 649418400, 649422000,
+        649425600, 649429200, 649432800, 649436400, 649440000, 649443600, 649447200, 649450800, 649454400,
+        649458000, 649461600, 649465200
+    ]
+    for i, elem in enumerate(downstream_water_level):
+        data_str += f"{times[i]}  {elem['data']}\n"
 
     content = f"""[forcing]
 Name                            = WL_0001
@@ -299,8 +298,16 @@ Unit                            = m
 
 def write_upstream_water_level(upstream_water_level):
     data_str = ""
-    for elem in upstream_water_level:
-        data_str += f"{datetime_to_timestamp(elem['datetime'])}  {elem['data']}\n"
+    times = [
+        649296000, 649299600, 649303200, 649306800, 649310400, 649314000, 649317600, 649321200, 649324800,
+        649328400, 649332000, 649335600, 649339200, 649342800, 649346400, 649350000, 649353600, 649357200,
+        649360800, 649364400, 649368000, 649371600, 649375200, 649378800, 649382400, 649386000, 649389600,
+        649393200, 649396800, 649400400, 649404000, 649407600, 649411200, 649414800, 649418400, 649422000,
+        649425600, 649429200, 649432800, 649436400, 649440000, 649443600, 649447200, 649450800, 649454400,
+        649458000, 649461600, 649465200,
+    ]
+    for i, elem in enumerate(upstream_water_level):
+        data_str += f"{times[i]}  {elem['data']}\n"
 
     content = f"""[forcing]
 Name                            = Boundary01_0001

@@ -3,15 +3,6 @@ from typing import Optional
 
 
 @dataclass
-class ModelForecastRequest:
-    scheme_name: Optional[str] = field(default=None)
-    date_time: Optional[str] = field(default=None)
-    step_size: Optional[int] = field(default=None)
-    schem_description: Optional[str] = field(default=None)
-    args: list[str] = field(default_factory=list)
-
-
-@dataclass
 class HandleMapRequest:
     project_id: int
     min_water_depth: Optional[float] = field(default=0)
@@ -27,8 +18,8 @@ class RunProjectRequest:
     name: str
     description: str
     forecast_period: int
-    upstream_water_level: list
-    downstream_water_level: list
+    upstream_water_level: Optional[list] = field(default=None)
+    downstream_water_level: Optional[list] = field(default=None)
 
 
 @dataclass

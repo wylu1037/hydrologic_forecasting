@@ -64,6 +64,12 @@ def is_two_decimal_number(number):
 
 
 def download_png():
+    """
+    下载图片资源
+
+    Returns
+        string: 图片的下载位置
+    """
     png_file = f'{BASE_DIR}/storage/water_level.png'
     try:
         response = requests.get(
