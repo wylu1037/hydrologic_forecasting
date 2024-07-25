@@ -119,6 +119,18 @@ def export_map_controller(request):
 
 
 @csrf_exempt
+def export_history_map_controller(request):
+    if request.method == 'GET':
+        return JsonResponse({'code': -1, 'error': 'Unsupported method'})
+    try:
+        data = service.export_history_map()
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})
+
+
+@csrf_exempt
 def export_station_controller(request):
     if request.method == 'GET':
         return JsonResponse({'code': -1, 'error': 'Unsupported method'})

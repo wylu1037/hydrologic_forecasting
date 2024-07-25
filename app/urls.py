@@ -6,6 +6,7 @@ urlpatterns = [
     path('v1/ping', views.ping_controller, name='ping'),
     path('v1/map/handle', views.handle_map_controller, name='handle_map_controller'),
     path('v1/map/export', views.export_map_controller, name='export_map_controller'),
+    path('v1/map/history/export', views.export_history_map_controller, name='export_history_map_controller'),
     path('v1/station/handle', views.handle_station_controller, name='handle_station_controller'),
     path('v1/station/export', views.export_station_controller, name='export station'),
     path('v1/project/run', views.run_project, name='create project'),

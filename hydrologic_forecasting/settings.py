@@ -18,7 +18,7 @@ import yaml
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-with open("application.yml", 'r') as config_file:
+with open("application.yml", 'r', encoding='utf-8') as config_file:
     config = yaml.safe_load(config_file)
     print(config)
 

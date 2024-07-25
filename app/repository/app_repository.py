@@ -2,6 +2,7 @@ from django.core.paginator import Paginator
 from django.db import connection
 
 from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel, Rainfall
+from app.tools import timestamp_to_datetime, convert_map_data_to_json
 
 
 class AppRepository:
@@ -224,6 +225,34 @@ class AppRepository:
     def get_latest_rainfall():
         result = Rainfall.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
         return convert_to_json(result)
+
+    @staticmethod
+    def get_map_times(project):
+        times = MapData.objects.filter(project=project).values('timestamp').distinct().order_by('-timestamp')
+        return times
+
+    @staticmethod
+    def get_map_by_timestamp(timestamp):
+        data = (
+            MapData.objects.filter(timestamp=timestamp)
+            .values_list('id', 'longitude', 'latitude', 'water_depth',
+                         'risk', 'timestamp')
+        )
+        return list(data)
+
+    @staticmethod
+    def get_history_map(project):
+        times = AppRepository.get_map_times(project)
+        arr = []
+        for time in times:
+            data = AppRepository.get_map_by_timestamp(time['timestamp'])
+            datetime = timestamp_to_datetime(time['timestamp'])
+            arr.append({
+                'time': datetime,
+                'data': convert_map_data_to_json(data)
+            })
+
+        return arr
 
 
 def convert_to_json(result):

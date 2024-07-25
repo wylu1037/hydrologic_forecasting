@@ -88,5 +88,19 @@ def download_png():
         raise e
 
 
+def convert_map_data_to_json(data):
+    json_array = []
+    for elem in data:
+        json_data = {
+            'id': elem[0],
+            'coordinates': [[y, x] for x, y in zip(elem[1], elem[2])],
+            'waterDepth': elem[3],
+            'risk': elem[4],
+            'time': timestamp_to_datetime(elem[5])
+        }
+        json_array.append(json_data)
+    return json_array
+
+
 if __name__ == '__main__':
     download_png()

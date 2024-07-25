@@ -8,7 +8,7 @@ from shapely import MultiPoint
 from app.models import Project
 from app.repository.app_repository import AppRepository
 from app.request import HandleMapRequest, HandleStationRequest
-from app.tools import search_file
+from app.tools import search_file, convert_map_data_to_json
 from app.tools import timestamp_to_datetime, datetime_to_timestamp
 from hydrologic_forecasting.settings import config
 
@@ -54,8 +54,6 @@ class AppService:
         """
         创建项目，并运行模型
         """
-        project_id = self.repository.insert_project(req)
-
         # write input data
         # WaterLevel.bc Discharge.bc
         if req.upstream_water_level is None or req.downstream_water_level is None:
@@ -72,6 +70,7 @@ class AppService:
             raise RuntimeError(result.stderr)
         else:
             # 执行成功
+            project_id = self.repository.insert_project(req)
             self.handle_map(HandleMapRequest(project_id=project_id))
             self.handle_station(HandleStationRequest(project_id=project_id))
             return result.stdout
@@ -172,17 +171,11 @@ class AppService:
         start_time = datetime_to_timestamp(req.start_time)
         end_time = datetime_to_timestamp(req.end_time)
         data = self.repository.get_map_list(project, start_time, end_time)
-        json_array = []
-        for elem in data:
-            json_data = {
-                'id': elem[0],
-                'coordinates': [[y, x] for x, y in zip(elem[1], elem[2])],
-                'waterDepth': elem[3],
-                'risk': elem[4],
-                'time': timestamp_to_datetime(elem[5])
-            }
-            json_array.append(json_data)
-        return json_array
+        return convert_map_data_to_json(data)
+
+    def export_history_map(self):
+        project = self.repository.get_latest_project()
+        return self.repository.get_history_map(project)
 
     def export_station(self, req):
         """
