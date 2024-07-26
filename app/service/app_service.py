@@ -187,8 +187,10 @@ class AppService:
         data = self.repository.get_map_by_project_and_timestamp(project, times[0]['timestamp'])
         return convert_map_data_to_json(data)
 
-    def export_history_map(self):
-        project = self.repository.get_latest_project()
+    def export_history_map(self, req):
+        if req.project_id is None:
+            req.project_id = self.repository.get_latest_project().id
+        project = Project.objects.get(pk=req.project_id)
         return self.repository.get_history_map(project)
 
     def export_station(self, req):
@@ -229,8 +231,10 @@ class AppService:
             'total': data['total'],
         }
 
-    def representation_station(self):
-        data = self.repository.representation_station()
+    def representation_station(self, req):
+        if req.project_id is None:
+            req.project_id = self.repository.get_latest_project().id
+        data = self.repository.representation_station(req.project_id)
 
         json_arr = []
         for elem in data:

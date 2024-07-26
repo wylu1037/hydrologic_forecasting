@@ -109,17 +109,18 @@ class AppRepository:
         return data
 
     @staticmethod
-    def representation_station():
+    def representation_station(project_id):
         query = """
         select id, station_name, max(water_depth) as water_depth, max(velocity_magnitude) as velocity_magnitude, timestamp
         from (select *
               from app_stationdata
+              where project_id = %s
               order by id desc
               limit 480)
         group by timestamp;
         """
         with connection.cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, [project_id])
             columns = [col[0] for col in cursor.description]
             data = [
                 dict(zip(columns, row))

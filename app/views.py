@@ -7,7 +7,8 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view
 
 from app.request import HandleMapRequest, RunProjectRequest, HandleStationRequest, \
-    ExportMapRequest, ExportStationRequest, UpdateProjectRequest, ExportHistoryStationRequest
+    ExportMapRequest, ExportStationRequest, UpdateProjectRequest, ExportHistoryStationRequest, \
+    RepresentationStationRequest, ExportHistoryMapRequest
 from app.service.app_service import AppService
 
 service = AppService()
@@ -159,7 +160,8 @@ def export_map_controller(request):
 @csrf_exempt
 def export_history_map_controller(request):
     try:
-        data = service.export_history_map()
+        req = request_to_object(request, ExportHistoryMapRequest)
+        data = service.export_history_map(req)
     except Exception as e:
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
@@ -235,7 +237,8 @@ def forewarning_pagination_controller(request, page, size):
 @csrf_exempt
 def representation_station_controller(request):
     try:
-        data = service.representation_station()
+        req = request_to_object(request, RepresentationStationRequest)
+        data = service.representation_station(req)
     except Exception as e:
         return JsonResponse({'code': -1, 'error': str(e)})
     else:

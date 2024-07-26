@@ -5,12 +5,17 @@ from typing import Optional
 @dataclass
 class HandleMapRequest:
     project_id: int
-    min_water_depth: Optional[float] = field(default=0)
+    min_water_depth: Optional[float] = field(default=0.1)
 
 
 @dataclass
 class HandleStationRequest:
     project_id: int
+
+
+@dataclass
+class RepresentationStationRequest:
+    project_id: Optional[int] = field(default=None)
 
 
 @dataclass
@@ -46,5 +51,6 @@ class ExportHistoryStationRequest:
     project_id: Optional[int] = field(default=None)
 
 
-class RepresentationStationRequest:
-    count: int = field(default=10)
+@dataclass
+class ExportHistoryMapRequest:
+    project_id: Optional[int] = field(default=None)
