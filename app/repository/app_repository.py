@@ -290,6 +290,11 @@ class AppRepository:
         )
         return list(data)
 
+    @staticmethod
+    def project_list():
+        data = Project.objects.all().values_list('id', 'name', 'description', 'forecast_period').order_by('-id')
+        return list(data)
+
 
 def convert_to_json(result):
     json_arr = []

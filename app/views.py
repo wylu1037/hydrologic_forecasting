@@ -75,7 +75,7 @@ def handle_station_controller(request):
 )
 @api_view(['POST'])
 @csrf_exempt
-def run_project(request):
+def run_project_controller(request):
     """
     创建项目，并运行模型
     """
@@ -89,11 +89,25 @@ def run_project(request):
 
 
 @extend_schema(
+    summary="方案列表",
+)
+@api_view(['GET'])
+@csrf_exempt
+def project_list_controller(request):
+    try:
+        data = service.project_list()
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})
+
+
+@extend_schema(
     summary="更新方案",
 )
 @api_view(['POST'])
 @csrf_exempt
-def update_project(request):
+def update_project_controller(request):
     """
     更新项目
     """
@@ -111,7 +125,7 @@ def update_project(request):
 )
 @api_view(['POST'])
 @csrf_exempt
-def delete_project(request, project_id):
+def delete_project_controller(request, project_id):
     """
     删除项目信息
     """
@@ -187,7 +201,7 @@ def export_history_station_controller(request):
 )
 @api_view(['GET'])
 @csrf_exempt
-def project_pagination(request, page, size):
+def project_pagination_controller(request, page, size):
     try:
         data = service.project_pagination(page, size)
     except Exception as e:
@@ -200,7 +214,7 @@ def project_pagination(request, page, size):
     summary="分页查询实时预警信息",
 )
 @api_view(['GET'])
-def forewarning_pagination(request, page, size):
+def forewarning_pagination_controller(request, page, size):
     """
     分页查询实时预警数据
     """
@@ -247,7 +261,7 @@ def trend_station_controller(request, name):
 )
 @api_view(['POST'])
 @csrf_exempt
-def latest_water_information(request):
+def latest_water_information_controller(request):
     try:
         data = service.latest_water_information()
     except Exception as e:

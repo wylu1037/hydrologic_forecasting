@@ -75,6 +75,20 @@ class AppService:
             self.handle_station(HandleStationRequest(project_id=project_id))
             return result.stdout
 
+    def project_list(self):
+        data = self.repository.project_list()
+        json_arr = []
+        for item in data:
+            json_arr.append(
+                {
+                    'id': item[0],
+                    'name': item[1],
+                    'description': item[2],
+                    'forecastPeriod': item[3],
+                }
+            )
+        return json_arr
+
     def update_project(self, req):
         self.repository.update_project(req)
 
