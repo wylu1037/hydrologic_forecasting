@@ -14,6 +14,8 @@ urlpatterns = [
     path('v1/project/update', views.update_project, name='update project'),
     path('v1/project/delete/<int:project_id>', views.delete_project, name='delete project'),
     path('v1/project/pagination/<int:page>/<int:size>', views.project_pagination, name='project pagination'),
+    path('v1/forewarning/pagination/<int:page>/<int:size>', views.forewarning_pagination,
+         name='forewarning pagination'),
     path('v1/station/representation', views.representation_station_controller,
          name='representation_station_controller'),
     path('v1/station/trend/<str:name>', views.trend_station_controller, name='trend_station_controller'),

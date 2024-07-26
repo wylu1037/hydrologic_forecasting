@@ -192,6 +192,29 @@ class AppService:
     def project_pagination(self, page, size):
         return self.repository.project_pagination(page, size)
 
+    def forewarning_pagination(self, page, size):
+        project = self.repository.get_latest_project()
+        data = self.repository.forewarning_pagination(project, page, size)
+        json_array = []
+        for elem in data['items']:
+            json_data = {
+                'id': elem[0],
+                'coordinates': [[y, x] for x, y in zip(elem[1], elem[2])],
+                'waterDepth': elem[3],
+                'riskLevel': elem[4],
+                'warningLevel': WARNING_RISK_DICT[elem[4]],
+                'time': timestamp_to_datetime(elem[5]),
+                'createdAt': elem[6].strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            json_array.append(json_data)
+
+        return {
+            'items': json_array,
+            'page': data['page'],
+            'size': data['size'],
+            'total': data['total'],
+        }
+
     def representation_station(self):
         data = self.repository.representation_station()
 
@@ -241,6 +264,14 @@ class AppService:
 
         data = self.repository.get_station_by_project_and_station_name(project, req.name)
         return convert_station_data_to_json(data)
+
+
+WARNING_RISK_DICT = {
+    1: "较低风险",
+    2: "中等风险",
+    3: "较高风险",
+    4: "高风险",
+}
 
 
 def write_downstream_water_level(downstream_water_level):

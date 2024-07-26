@@ -93,6 +93,22 @@ class AppRepository:
         return data
 
     @staticmethod
+    def forewarning_pagination(project, page, size):
+        rows = MapData.objects.filter(project=project).order_by('-id')
+        paginator = Paginator(rows, size)
+        items = paginator.get_page(page)
+
+        data = {
+            'items': list(
+                items.object_list.values_list(
+                    'id', 'longitude', 'latitude', 'water_depth', 'risk', 'timestamp', 'created_at')),
+            'page': items.number,
+            'size': size,
+            'total': paginator.count
+        }
+        return data
+
+    @staticmethod
     def representation_station():
         query = """
         select id, station_name, max(water_depth) as water_depth, max(velocity_magnitude) as velocity_magnitude, timestamp
