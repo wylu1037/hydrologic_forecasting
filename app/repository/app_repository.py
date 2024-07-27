@@ -85,7 +85,7 @@ class AppRepository:
         paginator = Paginator(projects, size)
         items = paginator.get_page(page)
         data = {
-            'items': list(items.object_list.values_list('id', 'name', 'description', 'created_at')),
+            'items': list(items.object_list.values_list('id', 'name', 'description', 'created_at', 'forecast_period')),
             'page': items.number,
             'size': size,
             'total': paginator.count
@@ -158,7 +158,7 @@ class AppRepository:
 
     @staticmethod
     def insert_project(req):
-        project = Project(name=req.name, description=req.description, forecast_period=req.forecast_period)
+        project = Project(name=req.name, description=req.description, forecast_period=req.forecast_period, start_time=req.start_time)
         project.save()
         return project.id
 

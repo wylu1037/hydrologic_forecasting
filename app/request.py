@@ -23,6 +23,7 @@ class RunProjectRequest:
     name: str
     description: str
     forecast_period: int
+    start_time: str
     upstream_water_level: Optional[list] = field(default=None)
     downstream_water_level: Optional[list] = field(default=None)
 

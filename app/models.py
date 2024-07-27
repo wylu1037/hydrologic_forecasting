@@ -8,6 +8,7 @@ class Project(models.Model):
     """
     name = models.CharField(max_length=100)
     description = models.TextField()
+    start_time = models.DateTimeField()
     forecast_period = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
