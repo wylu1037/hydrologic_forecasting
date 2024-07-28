@@ -26,6 +26,7 @@ class RunProjectRequest:
     start_time: str
     upstream_water_level: Optional[list] = field(default=None)
     downstream_water_level: Optional[list] = field(default=None)
+    type: Optional[int] = field(default=1)
 
 
 @dataclass

@@ -170,7 +170,7 @@ class AppRepository:
     @staticmethod
     def insert_project(req):
         project = Project(name=req.name, description=req.description, forecast_period=req.forecast_period,
-                          start_time=req.start_time)
+                          start_time=req.start_time, type=req.type)
         project.save()
         return project.id
 

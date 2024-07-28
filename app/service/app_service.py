@@ -61,14 +61,12 @@ class AppService:
             res = self.latest_water_information(req.start_time)
             req.upstream_water_level = res['upstreamWaterLevel']
             req.downstream_water_level = res['downstreamWaterLevel']
-        #write_upstream_water_level(req.upstream_water_level)
-        #write_downstream_water_level(req.downstream_water_level)
+        write_upstream_water_level(req.upstream_water_level)
+        write_downstream_water_level(req.downstream_water_level)
 
-        datetimes = []
+        date_times = []
         for v in req.upstream_water_level:
-            datetimes.append(v['datetime'])
-
-        self.handle_map(HandleMapRequest(project_id=1), datetimes)
+            date_times.append(v['datetime'])
 
         # execute bat
         bat_path = config['model']['script']['bat_path']
@@ -78,8 +76,8 @@ class AppService:
         else:
             # 执行成功
             project_id = self.repository.insert_project(req)
-            self.handle_map(HandleMapRequest(project_id=project_id))
-            self.handle_station(HandleStationRequest(project_id=project_id))
+            self.handle_map(HandleMapRequest(project_id=project_id), date_times)
+            self.handle_station(HandleStationRequest(project_id=project_id), date_times)
             return result.stdout
 
     def project_list(self):
