@@ -101,7 +101,7 @@ class AppService:
         """
         output_dir = config['model']['script']['output']
         nc_file = search_file(output_dir, '_map.nc')
-        risk_nc_file = search_file(output_dir, '_clm.nc')
+        risk_nc_file = search_file(output_dir, 'Modified_FlowFM_clm.nc')
 
         # 获取经纬度和数据
         dataset = nc.Dataset(nc_file)
@@ -115,7 +115,13 @@ class AppService:
 
         # 判断是三角网格还是四角网格，并生成相应的几何图形
         project = self.repository.get_project_by_id(req.project_id)
+        # idx 0-23  0   1
         for idx, time in enumerate(times):
+            if project.type == 0 and idx < 23:
+                continue
+            if project.type == 1 and idx < 24:
+                continue
+
             water_depth = water_depth_arr[idx, :]
             risk = risk_arr[idx, :]
             for i, face_node in enumerate(face_nodes):
@@ -169,6 +175,12 @@ class AppService:
 
         project = self.repository.get_project_by_id(req.project_id)
         for i, time in enumerate(times):
+            # 计算好的模型只需要最后1个小时
+            if project.type == 0 and i < 23:
+                continue
+            # 实时计算的模型需要取[24:47]
+            if project.type == 1 and i < 24:
+                continue
             for j in range(lon.size):
                 station_name = ''.join([name.strip() for name in station_names[j].compressed().astype(str) if name])
                 self.repository.upsert_station(

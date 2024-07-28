@@ -12,6 +12,7 @@ class Project(models.Model):
     forecast_period = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    type = models.IntegerField(default=0)
 
 
 class MapData(models.Model):

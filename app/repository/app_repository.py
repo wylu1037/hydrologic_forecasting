@@ -158,7 +158,8 @@ class AppRepository:
 
     @staticmethod
     def insert_project(req):
-        project = Project(name=req.name, description=req.description, forecast_period=req.forecast_period, start_time=req.start_time)
+        project = Project(name=req.name, description=req.description, forecast_period=req.forecast_period,
+                          start_time=req.start_time)
         project.save()
         return project.id
 
@@ -293,7 +294,11 @@ class AppRepository:
 
     @staticmethod
     def project_list():
-        data = Project.objects.all().values_list('id', 'name', 'description', 'forecast_period').order_by('-id')
+        data = (
+            Project.objects.filter(type=1)
+            .values_list('id', 'name', 'description', 'forecast_period')
+            .order_by('-id')
+        )
         return list(data)
 
 
