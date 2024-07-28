@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 
@@ -70,7 +71,9 @@ class AppService:
 
         # execute bat
         bat_path = config['model']['script']['bat_path']
-        result = subprocess.run([bat_path], capture_output=True, text=True)
+        bat_workspace = config['model']['script']['bat_workspace']
+        result = subprocess.run([bat_path], cwd=bat_workspace, capture_output=True, text=True)
+        print(f"执行bat脚本结束，返回结果：{result}")
         if result.returncode != 0:
             raise RuntimeError(result.stderr)
         else:

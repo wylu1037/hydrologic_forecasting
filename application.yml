@@ -3,6 +3,7 @@ model:
     input: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/input" # 模型的输入路径
     output: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/output" # 模型的输出路径
     bat_path: "" # bat脚本的路径
+    bat_workspace: "" # bat脚本的工作空间
     rainfall_path: "/Users/wenyanglu/Workspace/github/hydrologic_forecasting/storage/Return_Rain.csv"
 
 scheduler:
