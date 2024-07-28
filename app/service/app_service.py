@@ -58,11 +58,17 @@ class AppService:
         # write input data
         # WaterLevel.bc Discharge.bc
         if req.upstream_water_level is None or req.downstream_water_level is None:
-            res = self.latest_water_information()
+            res = self.latest_water_information(req.start_time)
             req.upstream_water_level = res['upstreamWaterLevel']
             req.downstream_water_level = res['downstreamWaterLevel']
-        write_upstream_water_level(req.upstream_water_level)
-        write_downstream_water_level(req.downstream_water_level)
+        #write_upstream_water_level(req.upstream_water_level)
+        #write_downstream_water_level(req.downstream_water_level)
+
+        datetimes = []
+        for v in req.upstream_water_level:
+            datetimes.append(v['datetime'])
+
+        self.handle_map(HandleMapRequest(project_id=1), datetimes)
 
         # execute bat
         bat_path = config['model']['script']['bat_path']
@@ -96,7 +102,7 @@ class AppService:
     def delete_project(self, project_id):
         self.repository.delete_project(project_id)
 
-    def handle_map(self, req):
+    def handle_map(self, req, date_times=None):
         """
         处理网格数据
         """
@@ -113,6 +119,8 @@ class AppService:
         water_depth_arr = dataset.variables['mesh2d_waterdepth'][:]  # 169, 61309
         risk_arr = risk_ds.variables['mesh2d_waterdepth'][:]
         times = dataset.variables['time'][:]
+        if date_times is not None:
+            times = date_times
 
         # 判断是三角网格还是四角网格，并生成相应的几何图形
         project = self.repository.get_project_by_id(req.project_id)
@@ -158,7 +166,7 @@ class AppService:
                 else:
                     continue
 
-    def handle_station(self, req):
+    def handle_station(self, req, date_times=None):
         """
         处理站点数据
         """
@@ -170,6 +178,8 @@ class AppService:
         lat = dataset.variables['station_y_coordinate'][:]
         station_names = dataset.variables['station_name'][:]
         times = dataset.variables['time'][:]
+        if date_times is not None:
+            times = date_times
         water_depth = dataset.variables['waterdepth'][:]
         water_level = dataset.variables['waterlevel'][:]
         velocity_magnitude = dataset.variables['velocity_magnitude'][:]
@@ -277,10 +287,10 @@ class AppService:
             json_arr.append(json_data)
         return json_arr
 
-    def latest_water_information(self):
-        rainfall = self.repository.get_latest_rainfall()
-        upstream_water_level = self.repository.get_latest_upstream_water_level()
-        downstream_water_level = self.repository.get_latest_downstream_water_level()
+    def latest_water_information(self, start_time=None):
+        rainfall = self.repository.get_latest_rainfall(start_time)
+        upstream_water_level = self.repository.get_latest_upstream_water_level(start_time)
+        downstream_water_level = self.repository.get_latest_downstream_water_level(start_time)
 
         return {
             'rainfall': rainfall,
@@ -312,6 +322,7 @@ class AppService:
     def get_rainfall_series(self, project_id):
         project = self.repository.get_project_by_id(project_id)
         return self.repository.get_rainfall_series(project)
+
 
 WARNING_RISK_DICT = {
     1: "较低风险",

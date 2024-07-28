@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from django.db import connection
 
 from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel, Rainfall, RainfallSeries
-from app.tools import timestamp_to_datetime, convert_map_data_to_json
+from app.tools import timestamp_to_datetime, convert_map_data_to_json, datetime_to_timestamp
 
 
 class AppRepository:
@@ -17,18 +17,23 @@ class AppRepository:
             lat(list)
             water_depth(float)
             risk(int)
-            timestamp(float)
+            timestamp(float or str)
 
         Returns
             int
         """
+        converted_timestamp = 0
+        if timestamp is float:
+            converted_timestamp = int(timestamp)
+        elif timestamp is str:
+            converted_timestamp = datetime_to_timestamp(timestamp)
         count = MapData.objects.filter(
             project=project,
             longitude=lon,
             latitude=lat,
             water_depth=water_depth,
             risk=risk,
-            timestamp=int(timestamp)
+            timestamp=converted_timestamp
         ).count()
         if count > 0:
             return None
@@ -39,17 +44,22 @@ class AppRepository:
             latitude=lat,
             water_depth=water_depth,
             risk=risk,
-            timestamp=int(timestamp),
+            timestamp=converted_timestamp,
         )
         data.save()
         return data.id
 
     @staticmethod
     def upsert_station(project, station_name, lon, lat, water_depth, water_level, velocity_magnitude, timestamp):
+        converted_timestamp = 0
+        if timestamp is float:
+            converted_timestamp = int(timestamp)
+        elif timestamp is str:
+            converted_timestamp = datetime_to_timestamp(timestamp)
         count = StationData.objects.filter(
             project=project, station_name=station_name, longitude=lon, latitude=lat, water_depth=water_depth,
             water_level=water_level, velocity_magnitude=velocity_magnitude,
-            timestamp=int(timestamp)).count()
+            timestamp=converted_timestamp).count()
         if count > 0:
             return None
 
@@ -61,7 +71,7 @@ class AppRepository:
             water_depth=water_depth,
             water_level=water_level,
             velocity_magnitude=velocity_magnitude,
-            timestamp=int(timestamp),
+            timestamp=converted_timestamp,
         )
         data.save()
 
@@ -215,19 +225,34 @@ class AppRepository:
         return model_data.id
 
     @staticmethod
-    def get_latest_upstream_water_level():
-        result = UpstreamWaterLevel.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
-        return convert_to_json(result)
+    def get_latest_upstream_water_level(start_time=None):
+        if start_time is None:
+            result = UpstreamWaterLevel.objects.order_by('datetime')[:48].values_list('station', 'datetime', 'data')
+            return convert_to_json(result)
+        else:
+            result = UpstreamWaterLevel.objects.filter(datetime__gte=start_time).order_by('datetime')[:48].values_list(
+                'station', 'datetime', 'data')
+            return convert_to_json(result)
 
     @staticmethod
-    def get_latest_downstream_water_level():
-        result = DownstreamWaterLevel.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
-        return convert_to_json(result)
+    def get_latest_downstream_water_level(start_time=None):
+        if start_time is None:
+            result = DownstreamWaterLevel.objects.order_by('datetime')[:48].values_list('station', 'datetime', 'data')
+            return convert_to_json(result)
+        else:
+            result = DownstreamWaterLevel.objects.filter(datetime__gte=start_time).order_by('datetime')[:48].values_list('station', 'datetime', 'data')
+            return convert_to_json(result)
 
     @staticmethod
-    def get_latest_rainfall():
-        result = Rainfall.objects.order_by('-datetime')[:48].values_list('station', 'datetime', 'data')
-        return convert_to_json(result)
+    def get_latest_rainfall(start_time=None):
+        if start_time is None:
+            result = Rainfall.objects.order_by('datetime')[:48].values_list('station', 'datetime', 'data')
+            return convert_to_json(result)
+        else:
+            result = Rainfall.objects.filter(datetime__gte=start_time).order_by('datetime')[:48].values_list('station',
+                                                                                                             'datetime',
+                                                                                                             'data')
+            return convert_to_json(result)
 
     @staticmethod
     def get_map_times(project):

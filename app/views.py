@@ -272,6 +272,7 @@ def latest_water_information_controller(request):
     else:
         return JsonResponse({'code': 0, 'data': data})
 
+
 @extend_schema(
     summary="查询降雨序列"
 )
