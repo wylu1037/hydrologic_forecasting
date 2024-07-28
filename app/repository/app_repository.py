@@ -85,7 +85,8 @@ class AppRepository:
         paginator = Paginator(projects, size)
         items = paginator.get_page(page)
         data = {
-            'items': list(items.object_list.values_list('id', 'name', 'description', 'created_at', 'forecast_period')),
+            'items': list(items.object_list.values_list('id', 'name', 'description', 'created_at', 'forecast_period',
+                                                        'type')),
             'page': items.number,
             'size': size,
             'total': paginator.count
