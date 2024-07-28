@@ -92,6 +92,7 @@ class AppService:
                     'name': item[1],
                     'description': item[2],
                     'forecastPeriod': item[3],
+                    'type': item[4],
                 }
             )
         return json_arr
