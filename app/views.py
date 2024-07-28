@@ -271,3 +271,30 @@ def latest_water_information_controller(request):
         return JsonResponse({'code': -1, 'error': str(e)})
     else:
         return JsonResponse({'code': 0, 'data': data})
+
+@extend_schema(
+    summary="查询降雨序列"
+)
+@api_view(['GET'])
+@csrf_exempt
+def rainfall_series_controller(request, project_id):
+    try:
+        data = service.get_rainfall_series(project_id=project_id)
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})
+
+
+@extend_schema(
+    summary="读取降雨序列的CSV文件"
+)
+@api_view(['POST'])
+@csrf_exempt
+def handle_rainfall_series_controller(request):
+    try:
+        data = service.handle_rainfall_series()
+    except Exception as e:
+        return JsonResponse({'code': -1, 'error': str(e)})
+    else:
+        return JsonResponse({'code': 0, 'data': data})

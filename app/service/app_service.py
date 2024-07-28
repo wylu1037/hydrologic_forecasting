@@ -4,6 +4,7 @@ import subprocess
 import netCDF4 as nc
 import numpy as np
 from shapely import MultiPoint
+import pandas as pd
 
 from app.models import Project
 from app.repository.app_repository import AppRepository
@@ -295,6 +296,22 @@ class AppService:
         data = self.repository.get_station_by_project_and_station_name(project, req.name)
         return convert_station_data_to_json(data)
 
+    def handle_rainfall_series(self):
+        csv_path = config['model']['script']['rainfall_path']
+        data = pd.read_csv(csv_path, encoding='latin1')
+        # for i, column in enumerate(np.transpose(data.values)):
+        #     if i == 0:
+        #         continue
+        #     print(column)
+        project_arr = [2, 3, 4, 5, 6]
+        for i, column in enumerate(data.iloc[:, 1:].values.T):  # .values.T 将 DataFrame 转置，便于逐列遍历
+            project = self.repository.get_project_by_id(project_arr[i])
+            for elem in column:
+                self.repository.upsert_rainfall_series(project, elem)
+
+    def get_rainfall_series(self, project_id):
+        project = self.repository.get_project_by_id(project_id)
+        return self.repository.get_rainfall_series(project)
 
 WARNING_RISK_DICT = {
     1: "较低风险",

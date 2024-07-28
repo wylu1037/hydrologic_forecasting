@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.db import connection
 
-from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel, Rainfall
+from app.models import StationData, MapData, Project, UpstreamWaterLevel, DownstreamWaterLevel, Rainfall, RainfallSeries
 from app.tools import timestamp_to_datetime, convert_map_data_to_json
 
 
@@ -300,6 +300,30 @@ class AppRepository:
             .order_by('-id')
         )
         return list(data)
+
+    @staticmethod
+    def upsert_rainfall_series(project, rainfall):
+        count = RainfallSeries.objects.filter(project=project, rainfall=rainfall).count()
+        if count > 0:
+            return None
+
+        data = RainfallSeries(
+            project=project,
+            rainfall=rainfall
+        )
+        data.save()
+        return data.id
+
+    @staticmethod
+    def get_rainfall_series(project):
+        data = RainfallSeries.objects.filter(project=project).values_list('id', 'rainfall')
+        json_arr = []
+        for elem in list(data):
+            json_arr.append({
+                "id": elem[0],
+                "rainfall": elem[1]
+            })
+        return json_arr
 
 
 def convert_to_json(result):

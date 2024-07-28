@@ -21,4 +21,8 @@ urlpatterns = [
          name='representation_station_controller'),
     path('v1/station/trend/<str:name>', views.trend_station_controller, name='trend_station_controller'),
     path('v1/water/information/latest', views.latest_water_information_controller, name='latest_water_information'),
+    path('v1/project/rainfall/series/<int:project_id>', views.rainfall_series_controller,
+         name='rainfall_series_controller'),
+    path('v1/project/rainfall/series/handle', views.handle_rainfall_series_controller,
+         name='handle_rainfall_series_handle'),
 ]

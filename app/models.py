@@ -71,3 +71,12 @@ class DownstreamWaterLevel(models.Model):
     datetime = models.DateTimeField()
     data = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class RainfallSeries(models.Model):
+    """
+    降雨序列
+    """
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    rainfall = models.DecimalField(max_digits=10, decimal_places=2)
+
