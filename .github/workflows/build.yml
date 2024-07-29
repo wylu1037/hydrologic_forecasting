@@ -39,7 +39,7 @@ jobs:
 
       - name: Install PyInstaller
         run: |
-          pip install pyinstaller==5.13.2
+          pip install pyinstaller
 
       - name: Build package on Linux
         if: runner.os == 'Linux'
@@ -50,6 +50,11 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           pyinstaller --onefile --windowed manage.py
+
+      - name: Build package on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          pyinstaller --onefile manage.py
 
       - name: Archive build artifacts
         if: success()

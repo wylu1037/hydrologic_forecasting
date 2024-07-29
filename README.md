@@ -2,10 +2,13 @@
 
 ## 📚 Tech Stack
 
+- [x] [Python](https://www.python.org/) is a programming language that lets you work quickly
+and integrate systems more effectively.
 - [x] [Django](https://github.com/django/django) The Web framework for perfectionists with deadlines.
 - [x] [netCDF4]() Read nc file
 - [x] [GeoServer](https://docs.geoserver.org/latest/en/user/installation/win_installer.html) GeoServer is an open source
   server for sharing geospatial data.
+- [x] [Sqlite3](https://www.sqlite.org/)
 
 ## 🗺️ Maps
 
@@ -37,13 +40,6 @@
 Folium 是一个用于在 Python 中制作交互式地图的库，特别是基于 Leaflet.js 库构建的地图。它的主要作用是帮助用户在 Jupyter
 Notebook 环境中创建和展示交互式地图，并且能够轻松地将地理空间数据添加到地图中进行可视化。
 
-## 📆 Develop Plan
-
-| Item | Deadline | Remark | Status |
-|------|----------|--------|--------|
-|      |          |        |        |
-|      |          |        |        |
-|      |          |        |        |
 
 ## Requirements
 
