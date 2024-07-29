@@ -22,10 +22,9 @@ class AppRepository:
         Returns
             int
         """
-        converted_timestamp = 0
         if timestamp is float:
             converted_timestamp = int(timestamp)
-        elif timestamp is str:
+        else:
             converted_timestamp = datetime_to_timestamp(timestamp)
         count = MapData.objects.filter(
             project=project,
@@ -51,10 +50,9 @@ class AppRepository:
 
     @staticmethod
     def upsert_station(project, station_name, lon, lat, water_depth, water_level, velocity_magnitude, timestamp):
-        converted_timestamp = 0
         if timestamp is float:
             converted_timestamp = int(timestamp)
-        elif timestamp is str:
+        else:
             converted_timestamp = datetime_to_timestamp(timestamp)
         count = StationData.objects.filter(
             project=project, station_name=station_name, longitude=lon, latitude=lat, water_depth=water_depth,

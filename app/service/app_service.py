@@ -62,6 +62,8 @@ class AppService:
             res = self.latest_water_information(req.start_time)
             req.upstream_water_level = res['upstreamWaterLevel']
             req.downstream_water_level = res['downstreamWaterLevel']
+            if len(req.upstream_water_level) < 48 or len(req.downstream_water_level) < 48:
+                raise RuntimeError('模型输入时间不足48小时')
         write_upstream_water_level(req.upstream_water_level)
         write_downstream_water_level(req.downstream_water_level)
 
